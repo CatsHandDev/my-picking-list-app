@@ -58,6 +58,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
     });
 
     const list = Array.from(map.values());
+    list.sort((a, b) => a.商品名.localeCompare(b.商品名, 'ja'));
     const total = list.reduce((sum, item) => sum + item.個数, 0);
     const totalSingles = list.reduce((sum, item) => sum + item.単品換算数, 0);
 
@@ -88,7 +89,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
         </thead>
         <tbody>
           {pickingList.map((item, index) => (
-            <tr key={index}>
+            <tr key={`${item.JANコード}-${index}`}>
               <td></td>
               <td className="itemName">{item.商品名}</td>
               {/* JANコードは末尾4桁のみ表示 */}
