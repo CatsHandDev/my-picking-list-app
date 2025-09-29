@@ -7,6 +7,7 @@ import PickingList from '../components/PickingList';
 import type { OrderItem } from '../types';
 import { useReactToPrint } from 'react-to-print';
 import { useSheetData } from '../hooks/useSheetData';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import './page.css';
 
 function Home() {
@@ -68,9 +69,19 @@ function Home() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>ピッキングリスト</h1>
+        <h1 className="header-title">ピッキングリスト</h1>
         <div className="controls">
-          <input type="file" accept=".csv" onChange={handleFileChange} />
+          <label htmlFor="csv-upload" className="file-upload-label">
+            <UploadFileIcon />
+            <span>CSVファイルを選択</span>
+          </label>
+          <input
+            id="csv-upload"
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            style={{ display: 'none' }} // input自体は非表示にする
+          />
         </div>
       </header>
 
