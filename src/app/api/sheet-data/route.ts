@@ -1,39 +1,43 @@
 import { NextResponse } from 'next/server';
+import { google } from 'googleapis';
 
 export async function GET() {
   try {
-    const sheetUrl = process.env.SPREAD_SHEET_URL as string;
-    const apiKey = process.env.GOOGLE_API_KEY as string;
+    const spreadsheetId = process.env.SPREAD_SHEET_ID as string;
     const range = process.env.SPREAD_SHEET_RANGE as string;
 
-    // URL からスプレッドシートIDを抽出
-    const match = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)\//);
-    if (!match) {
-      return NextResponse.json(
-        { error: 'スプレッドシートIDがURLから取得できません' },
-        { status: 400 }
-      );
-    }
+    // サービスアカウント認証
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        // private_key の \n を元に戻す
+        private_key: (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+      },
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets.readonly', // 読み取り専用スコープ
+      ],
+    });
 
-    const sheetId = match[1];
-    const endpoint = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+    const sheets = google.sheets({
+      version: 'v4',
+      auth: auth,
+    });
 
-    const res = await fetch(endpoint);
-    if (!res.ok) {
-      const errorData = await res.json();
-      return NextResponse.json(
-        { error: `Google Sheets API Error: ${errorData.error.message}` },
-        { status: res.status }
-      );
-    }
+    // データを取得
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
 
-    const json = await res.json();
-    return NextResponse.json({ values: json.values || [] });
+    const values = response.data.values || [];
+
+    return NextResponse.json({ values });
 
   } catch (err) {
     const error = err as Error;
+    console.error('Google Sheets API Error:', error.message);
     return NextResponse.json(
-      { error: error.message },
+      { error: `スプレッドシートのデータ取得に失敗しました: ${error.message}` },
       { status: 500 }
     );
   }
