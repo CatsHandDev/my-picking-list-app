@@ -20,35 +20,49 @@ type RowData = {
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet }) => {
   const { pickingList, totalSingleUnits } = useMemo(() => {
     const map = new Map<string, RowData>();
-    /**
-     * map のキーは JANコード。
-     *  -> 商品コードごとにJANとロット入数をスプレッドシートから取得
-     *  -> JANが同じなら単品換算数を合算
-     */
+
     data.forEach((item) => {
       const itemCode = item["商品コード"];
       const count = parseInt(item["個数"], 10) || 0;
-      if (!itemCode) return;
+      if (count === 0) return; // 個数が0の商品はスキップ
 
-      // スプレッドシートから該当行を商品コード(Q列: index16)で検索
-      const row = sheet.find((r) => r[16] === itemCode);
-      const jan = row?.[5] || "";                     // F列がJANコード
-      const lotUnit = parseInt(row?.[6] || "1", 10);   // G列がロット入数(無ければ1)
+      // 各商品のデフォルト値をCSVの値で初期化
+      let jan = '';
+      let lotUnit = 1;
+      let productName = item['商品名'];
 
-      if (!jan) return;
+      // 商品コードがCSVに存在する場合のみ、スプレッドシートを検索
+      const row = itemCode ? sheet.find((r) => r[16] === itemCode) : undefined;
+
+      if (row) {
+        // --- スプレッドシートに商品コードが見つかった場合の処理 ---
+        const foundJan = row[5] || ""; // F列がJANコード
+
+        // JANコードが見つかった場合のみ、シートの情報を採用する
+        if (foundJan) {
+          jan = foundJan;
+          lotUnit = parseInt(row[6] || "1", 10); // G列がロット入数
+
+          // JANコードとG列=1の行を検索して、シート上の正式な商品名を取得
+          const nameRow = sheet.find((r) => r[5] === jan && r[6] === "1");
+          productName = nameRow?.[3] || item["商品名"]; // D列
+        }
+        // シートに商品コードはあってもJANがない場合は、デフォルト値が使われる
+      }
+      // --- スプレッドシートにない、または商品コードが元々ない場合は、デフォルト値がそのまま使われる ---
 
       const singleUnits = lotUnit * count;
 
-      // JANコードとG列=1の行を検索して商品名取得
-      const nameRow = sheet.find((r) => r[5] === jan && r[6] === "1");
-      const productName = nameRow?.[3] || item["商品名"]; // D列
+      // 集計用のキーを決定。JANコードがあればJANを、なければ商品名を使用する
+      const mapKey = jan || productName;
 
-      if (map.has(jan)) {
-        const ex = map.get(jan)!;
-        ex.個数 += count;                // ケース単位合計
-        ex.単品換算数 += singleUnits;    // 単品換算合計
+      // キーを元にデータを集計
+      if (map.has(mapKey)) {
+        const ex = map.get(mapKey)!;
+        ex.個数 += count;
+        ex.単品換算数 += singleUnits;
       } else {
-        map.set(jan, {
+        map.set(mapKey, {
           商品名: productName,
           JANコード: jan,
           個数: count,
@@ -58,11 +72,13 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
     });
 
     const list = Array.from(map.values());
+
+    // 商品名でリストを昇順にソートする
     list.sort((a, b) => a.商品名.localeCompare(b.商品名, 'ja'));
-    const total = list.reduce((sum, item) => sum + item.個数, 0);
+
     const totalSingles = list.reduce((sum, item) => sum + item.単品換算数, 0);
 
-    return { pickingList: list, totalCount: total, totalSingleUnits: totalSingles };
+    return { pickingList: list, totalSingleUnits: totalSingles };
   }, [data, sheet]);
 
   return (
