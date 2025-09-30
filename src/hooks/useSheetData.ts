@@ -15,6 +15,7 @@ export function useSheetData() {
           throw new Error(errorData.error || 'APIリクエストに失敗しました');
         }
         const json = await res.json();
+
         setSheetData(json.values || []);
       } catch (err) {
         setError(err as Error);

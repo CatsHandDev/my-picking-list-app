@@ -63,13 +63,29 @@ function Home() {
     });
   };
 
-  if (loading) return <div>スプレッドシートを読み込み中...</div>;
+  if (loading) {
+    return (
+      <div className="cube-container">
+        <div className="cube-loader-preview">
+          <div className="cube">
+            <div className="cube-face front"></div>
+            <div className="cube-face back"></div>
+            <div className="cube-face right"></div>
+            <div className="cube-face left"></div>
+            <div className="cube-face top"></div>
+            <div className="cube-face bottom"></div>
+          </div>
+        </div>
+      </div>
+    )
+  };
+
   if (error) return <div>スプレッドシート取得エラー: {error.message}</div>;
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1 className="header-title">ピッキングリスト</h1>
+        <h1 className="header-title">SR！３秒ピッキング</h1>
         <div className="controls">
           <label htmlFor="csv-upload" className="file-upload-label">
             <UploadFileIcon />

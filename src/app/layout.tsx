@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Picking List",
+  title: "Smart Pick",
   description: "Assist in creating picking lists",
 };
 

@@ -1,13 +1,12 @@
 import React, { useMemo } from "react";
 import type { OrderItem } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
-import { log } from "console";
 
 interface Props {
   data: OrderItem[];
   shippingMethod: string;
   loadedAt: string;
-  /** Google Sheets の2次元配列（F列=JAN, G列=ロット入数, Q列=商品コード） */
+  /** Google Sheets の2次元配列（E列=ASIN, F列=JAN, G列=ロット入数, P列=商品コード, Q列=商品コード, R列=商品名） */
   sheet: string[][];
 }
 
@@ -16,6 +15,17 @@ type RowData = {
   JANコード: string;
   個数: number;        // CSVの個数合計
   単品換算数: number;  // ロット入数×個数 合計
+};
+
+/**
+ * ASIN変換ルールを管理するマップ。
+ * 今後、新しい変換ルールはここに追加するだけで対応できます。
+ * キー：変換元のASIN（必ず小文字で記述）
+ * 値：変換先のASIN
+ */
+const ASIN_TRANSFORMATION_MAP: { [key: string]: string } = {
+  'b0ccdgb44g': 'B0D11J69YH',
+  // 例：'another-old-asin': 'another-new-asin',
 };
 
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet }) => {
@@ -28,30 +38,43 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
       if (count === 0) return; // 個数が0の商品はスキップ
 
       // 各商品のデフォルト値をCSVの値で初期化
-      let jan = item["JANコード"];
+      // let jan = item["JANコード"];
+      let jan = "";
       let lotUnit = 1;
       let productName = item['商品名'];
 
       // 商品コードがCSVに存在する場合のみ、スプレッドシートを検索
       const row = itemCode ? sheet.find((r) => r[16]?.toLowerCase() === itemCode.toLowerCase()) : undefined;
-      console.log(itemCode);
-      console.log(row);
 
       if (row) {
         // --- スプレッドシートに商品コードが見つかった場合の処理 ---
-        const foundJan = row[5] || ""; // F列がJANコード
+        // 1. 最初に一致した行からASINを取得 (E列: index 4)
+        const originalAsin = row[4] || "";
+        const asin = ASIN_TRANSFORMATION_MAP[originalAsin.toLowerCase()] || originalAsin;
 
-        // JANコードが見つかった場合のみ、シートの情報を採用する
+        // 2. 「ASIN(E列)」と「商品コード(P列)」の両方が一致する行を再検索
+        const lotRow = (asin && itemCode)
+          ? sheet.find(r =>
+              r[4]?.toLowerCase() === asin.toLowerCase() &&     // E列(index 4)がASINと一致
+              r[15]?.toLowerCase() === itemCode.toLowerCase()  // P列(index 15)が商品コードと一致
+            )
+          : undefined;
+
+        // 3. lotRowが見つかれば、その行のロット入数(G列: index 6)を採用。見つからなければデフォルトの1のまま。
+        if (lotRow) {
+          lotUnit = parseInt(lotRow[6] || "1", 10);
+        }
+
+        // JANコードや商品名の取得ロジックは元の`row`を使用
+        const foundJan = lotRow?.[5] || ""; // F列がJANコード
+
         if (foundJan) {
           jan = foundJan;
-          lotUnit = parseInt(row[6] || "1", 10); // G列がロット入数
-
-          // JANコードとG列=1の行を検索して、シート上の正式な商品名を取得
-          productName = row?.[17] || item["商品名"]; // D列
+          // R列(index 17)から商品名を取得
+          productName = row[17] || item["商品名"];
         }
-        // シートに商品コードはあってもJANがない場合は、デフォルト値が使われる
       }
-      // --- スプレッドシートにない、または商品コードが元々ない場合は、デフォルト値がそのまま使われる ---
+      // --- スプレッドシートにない場合は、デフォルト値がそのまま使われる ---
 
       const singleUnits = lotUnit * count;
 
