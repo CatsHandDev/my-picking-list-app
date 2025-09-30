@@ -27,7 +27,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
       if (count === 0) return; // 個数が0の商品はスキップ
 
       // 各商品のデフォルト値をCSVの値で初期化
-      let jan = '';
+      let jan = item["JANコード"];
       let lotUnit = 1;
       let productName = item['商品名'];
 
