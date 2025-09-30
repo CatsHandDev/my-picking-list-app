@@ -45,7 +45,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
 
           // JANコードとG列=1の行を検索して、シート上の正式な商品名を取得
           const nameRow = sheet.find((r) => r[5] === jan && r[6] === "1");
-          productName = nameRow?.[3] || item["商品名"]; // D列
+          productName = nameRow?.[17] || item["商品名"]; // D列
         }
         // シートに商品コードはあってもJANがない場合は、デフォルト値が使われる
       }
