@@ -65,13 +65,12 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
           lotUnit = parseInt(lotRow[6] || "1", 10);
         }
 
-        // JANコードや商品名の取得ロジックは元の`row`を使用
         const foundJan = lotRow?.[5] || ""; // F列がJANコード
 
         if (foundJan) {
           jan = foundJan;
           // R列(index 17)から商品名を取得
-          productName = row[17] || item["商品名"];
+          productName = lotRow?.[17] || item["商品名"];
         }
       }
       // --- スプレッドシートにない場合は、デフォルト値がそのまま使われる ---

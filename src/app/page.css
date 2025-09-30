@@ -75,7 +75,7 @@ body {
 }
 
 button {
-  background-color: #61dafb;
+  background-color: #ccc;
   border: none;
   color: #444;
   padding: 10px 20px;
@@ -94,7 +94,7 @@ button:hover {
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: #61dafb;
   cursor: not-allowed;
 }
 
