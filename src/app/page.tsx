@@ -104,8 +104,11 @@ function Home() {
       {data.length > 0 && (
         <main>
           <div className="navigation">
-            <button onClick={() => setView('order')} disabled={view === 'order'}>注文リスト</button>
-            <button onClick={() => setView('picking')} disabled={view === 'picking'}>ピッキングリスト</button>
+            <div className="nav-tabs">
+              <button onClick={() => setView('order')} disabled={view === 'order'}>注文リスト</button>
+              <button onClick={() => setView('picking')} disabled={view === 'picking'}>ピッキングリスト</button>
+            </div>
+
             {view === 'picking' && (
               <button onClick={handlePrint} className="print-button">
                 印刷する
