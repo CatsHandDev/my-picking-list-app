@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import type { OrderItem } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
+import { log } from "console";
 
 interface Props {
   data: OrderItem[];
@@ -33,6 +34,8 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
 
       // 商品コードがCSVに存在する場合のみ、スプレッドシートを検索
       const row = itemCode ? sheet.find((r) => r[16] === itemCode) : undefined;
+      console.log(itemCode);
+      console.log(row);
 
       if (row) {
         // --- スプレッドシートに商品コードが見つかった場合の処理 ---
@@ -44,8 +47,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
           lotUnit = parseInt(row[6] || "1", 10); // G列がロット入数
 
           // JANコードとG列=1の行を検索して、シート上の正式な商品名を取得
-          const nameRow = sheet.find((r) => r[5] === jan && r[6] === "1");
-          productName = nameRow?.[17] || item["商品名"]; // D列
+          productName = row?.[17] || item["商品名"]; // D列
         }
         // シートに商品コードはあってもJANがない場合は、デフォルト値が使われる
       }
