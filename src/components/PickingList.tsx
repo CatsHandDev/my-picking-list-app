@@ -33,7 +33,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
       let productName = item['商品名'];
 
       // 商品コードがCSVに存在する場合のみ、スプレッドシートを検索
-      const row = itemCode ? sheet.find((r) => r[16] === itemCode) : undefined;
+      const row = itemCode ? sheet.find((r) => r[16]?.toLowerCase() === itemCode.toLowerCase()) : undefined;
       console.log(itemCode);
       console.log(row);
 
