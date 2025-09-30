@@ -1,0 +1,96 @@
+/* 印刷時のページ自体のマージン（余白）を設定 */
+@page {
+  size: A4;
+  margin-block: 20mm;
+}
+
+
+/* body全体の基本的な設定 */
+body {
+  margin: 0;
+  padding: 100px !important;
+}
+
+body * {
+  visibility: hidden;
+}
+
+h2 {
+  text-align: center;
+}
+
+
+/* 画面表示用のコンポーネントは印刷時には完全に非表示にする */
+.list-container, .App-header, .navigation, .controls, .file-upload-label, .nav-tabs {
+  display: none !important;
+}
+
+
+/* 印刷専用コンテナのスタイル */
+.printable-container {
+  display: block !important;
+  visibility: visible;
+}
+
+.printable-container * {
+  visibility: visible;
+  margin: 0;
+}
+
+/* ▼▼▼ ヘッダー下のマージンを削除 ▼▼▼ */
+.printable-container .picking-header {
+  margin-bottom: 0;
+}
+
+
+/* テーブルの改ページ制御 */
+table {
+  page-break-inside: auto;
+  width: 100%;
+  margin: 0;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tbody {
+  display: table-row-group;
+}
+
+tr {
+  page-break-inside: avoid !important;
+  page-break-after: auto;
+}
+
+
+/* 印刷用のテーブルスタイル */
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.footer-table {
+  margin-top: 0;
+}
+
+/* ... 既存のth, tdなどのスタイル ... */
+th, td {
+  padding: 16px 8px;
+  border: 1px solid #ddd !important;
+  color: #000;
+}
+
+th {
+  white-space: nowrap;
+}
+
+thead tr {
+  background-color: #f2f2f2 !important;
+}
+
+.footer-row {
+  font-weight: bold;
+  background-color: #e6e6e6;
+}

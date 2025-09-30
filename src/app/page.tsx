@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import Papa from 'papaparse';
 import OrderList from '../components/OrderList';
 import PickingList from '../components/PickingList';
-import type { OrderItem } from '../types';
+import PrintablePickingList from '../components/PrintablePickingList';
+import type { OrderItem, PickingItemRow } from '../types';
 import { useReactToPrint } from 'react-to-print';
 import { useSheetData } from '../hooks/useSheetData';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -19,6 +20,7 @@ function Home() {
   const { sheetData, loading, error } = useSheetData();
 
   const printRef = useRef<HTMLDivElement>(null);
+  const [pickingData, setPickingData] = useState<{ list: PickingItemRow[], total: number }>({ list: [], total: 0 });
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -62,6 +64,10 @@ function Home() {
       }
     });
   };
+
+  const onDataCalculated = useCallback((list: PickingItemRow[], total: number) => {
+    setPickingData({ list, total });
+  }, []);
 
   if (loading) {
     return (
@@ -120,14 +126,27 @@ function Home() {
             {view === 'order' ? (
               <OrderList data={data} />
             ) : (
-              <div ref={printRef}>
+              <>
+                {/* 1. 画面表示用のコンポーネント */}
                 <PickingList
                   data={data}
                   shippingMethod={shippingMethod}
                   loadedAt={loadedAt}
                   sheet={sheetData}
+                  onDataCalculated={onDataCalculated}
                 />
-              </div>
+
+                {/* 2. 印刷専用の非表示コンポーネント */}
+                <div style={{ display: 'none' }}>
+                  <PrintablePickingList
+                    ref={printRef}
+                    pickingList={pickingData.list}
+                    totalSingleUnits={pickingData.total}
+                    shippingMethod={shippingMethod}
+                    loadedAt={loadedAt}
+                  />
+                </div>
+              </>
             )}
           </div>
         </main>

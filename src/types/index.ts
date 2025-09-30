@@ -25,3 +25,10 @@ export interface PickingItem {
   '個数': number;
   'JANコード': string;
 }
+
+export interface PickingItemRow {
+  商品名: string;
+  JANコード: string;
+  個数: number;
+  単品換算数: number;
+}

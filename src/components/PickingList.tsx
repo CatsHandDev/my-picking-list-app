@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import type { OrderItem } from "../types";
+import React, { useEffect, useMemo } from "react";
+import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 
 interface Props {
@@ -8,14 +8,8 @@ interface Props {
   loadedAt: string;
   /** Google Sheets の2次元配列（E列=ASIN, F列=JAN, G列=ロット入数, P列=商品コード, Q列=商品コード, R列=商品名） */
   sheet: string[][];
+  onDataCalculated: (list: PickingItemRow[], total: number) => void;
 }
-
-type RowData = {
-  商品名: string;
-  JANコード: string;
-  個数: number;        // CSVの個数合計
-  単品換算数: number;  // ロット入数×個数 合計
-};
 
 /**
  * ASIN変換ルールを管理するマップ。
@@ -28,9 +22,9 @@ const ASIN_TRANSFORMATION_MAP: { [key: string]: string } = {
   // 例：'another-old-asin': 'another-new-asin',
 };
 
-const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet }) => {
+const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, onDataCalculated }) => {
   const { pickingList, totalSingleUnits } = useMemo(() => {
-    const map = new Map<string, RowData>();
+    const map = new Map<string, PickingItemRow>();
 
     data.forEach((item) => {
       const itemCode = item["商品コード"];
@@ -104,6 +98,10 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet })
 
     return { pickingList: list, totalSingleUnits: totalSingles };
   }, [data, sheet]);
+
+  useEffect(() => {
+    onDataCalculated(pickingList, totalSingleUnits);
+  }, [pickingList, totalSingleUnits, onDataCalculated]);
 
   return (
     <div className="list-container">

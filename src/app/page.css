@@ -355,6 +355,15 @@ tfoot .footer-row {
 
 /* 印刷用スタイル */
 @media print {
+  @page {
+    size: A4;
+    margin-block: 40px;
+  }
+
+  body {
+    padding-inline: 40px;
+  }
+
   body * {
     visibility: visible;
     font-size: 12px;
@@ -363,6 +372,7 @@ tfoot .footer-row {
 
   h2 {
     text-align: center;
+    font-size: 16px;
   }
 
   .list-container, .list-container * {
@@ -370,15 +380,42 @@ tfoot .footer-row {
   }
 
   .list-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: calc(100vw - 40px);
-    height: stretch;
+    position: static;
+    width: auto;
+    height: auto;
+    box-shadow: none;
+    margin: 0;
+    padding: 40px;
   }
 
-  .App-header, .navigation, .controls {
-    display: none;
+  /* 画面表示用のコンポーネントは印刷時に非表示にする */
+  .App-header, .navigation, .controls, .file-upload-label, .nav-tabs {
+    display: none !important;
+  }
+
+  .print-table {
+    margin-block: 0;
+  }
+
+
+  /* テーブルの改ページ制御 */
+  table {
+    page-break-inside: auto;
+    width: 100%;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tbody {
+    display: table-row-group;
+  }
+
+  tr {
+    /* 行の途中で改ページされるのを防ぐ（重要） */
+    page-break-inside: avoid !important;
+    page-break-after: auto;
   }
 
   th, td {
