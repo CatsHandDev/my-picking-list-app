@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import Papa from 'papaparse';
 import OrderList from '../components/OrderList';
 import PickingList from '../components/PickingList';
@@ -26,6 +26,16 @@ function Home() {
     contentRef: printRef,
     documentTitle: 'picking-list',
   });
+
+  const validDataForPicking = useMemo(() => {
+    // 商品URLが存在し、かつ空文字列でないものを抽出
+    return data.filter(item => item['商品URL'] && item['商品URL'].trim() !== '');
+  }, [data]); // dataが変更されたときだけ再計算される
+  
+  // 除外されたアイテムの数を計算
+  const excludedItemsCount = useMemo(() => {
+    return data.length - validDataForPicking.length;
+  }, [data, validDataForPicking]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -129,7 +139,8 @@ function Home() {
               <>
                 {/* 1. 画面表示用のコンポーネント */}
                 <PickingList
-                  data={data}
+                  excludedItemsCount={excludedItemsCount}
+                  data={validDataForPicking}
                   shippingMethod={shippingMethod}
                   loadedAt={loadedAt}
                   sheet={sheetData}

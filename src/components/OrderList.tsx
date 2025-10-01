@@ -6,42 +6,57 @@ interface Props {
 }
 
 const OrderList: React.FC<Props> = ({ data }) => {
+  const excludedItemsCount = data.filter(item => !item['商品URL'] || item['商品URL'].trim() === '').length;
+
   return (
-    <div className="list-container">
-      <div style={{ display: "flex", alignItems: "center", gap: 20}}>
+    <div className="list-wrapper"> 
+      {/* 1. 固定したいヘッダー部分 (スクロールするコンテナの外に出す) */}
+      <div className="list-header">
         <h2>注文リスト</h2>
         <span>総注文件数: {data.length}件</span>
+        {excludedItemsCount > 0 && (
+          <span className="warning-text">
+            ※うち1件はピッキング対象外（商品URLが空値）
+          </span>
+        )}
       </div>
-      <table>
-        <thead>
-          <tr className="orderList-container">
-            <th>注文日時</th>
-            <th style={{ width: "2%" }}>配送方法</th>
-            <th style={{ width: "3%" }}>GoQ管理番号</th>
-            <th>受注番号</th>
-            <th style={{ width: "4%" }}>注文者氏名</th>
-            <th style={{ width: "15%" }}>商品名</th>
-            <th style={{ width: "2%" }}>個数</th>
-            <th style={{ width: "4%" }}>JANコード</th>
-            <th>商品コード</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={`${item.受注番号}-${index}`}>
-              <td>{item['注文日時']}</td>
-              <td>{item['配送方法(複数配送先)']}</td>
-              <td>{item['GoQ管理番号']}</td>
-              <td>{item['受注番号']}</td>
-              <td>{item['注文者氏名']}</td>
-              <td className="itemName">{item['商品名']}</td>
-              <td style={{ textAlign: "center" }}>{item['個数']}</td>
-              <td>{item['JANコード']}</td>
-              <td>{item['商品コード']}</td>
+
+      {/* 2. このコンテナだけがスクロールする */}
+      <div className="list-scroller">
+        <table>
+          <thead>
+            <tr className="orderList-container">
+              <th>注文日時</th>
+              <th style={{ width: "2%" }}>配送方法</th>
+              <th style={{ width: "3%" }}>GoQ管理番号</th>
+              <th>受注番号</th>
+              <th style={{ width: "4%" }}>注文者氏名</th>
+              <th style={{ width: "15%" }}>商品名</th>
+              <th style={{ width: "2%" }}>個数</th>
+              <th style={{ width: "4%" }}>JANコード</th>
+              <th>商品コード</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((item, index) => {
+              const isExcluded = !item['商品URL'] || item['商品URL'].trim() === '';
+              return (
+                <tr key={`${item.受注番号}-${index}`} className={isExcluded ? 'excluded-row' : ''}>
+                  <td>{item['注文日時']}</td>
+                  <td>{item['配送方法(複数配送先)']}</td>
+                  <td>{item['GoQ管理番号']}</td>
+                  <td>{item['受注番号']}</td>
+                  <td>{item['注文者氏名']}</td>
+                  <td className="itemName">{item['商品名']}</td>
+                  <td style={{ textAlign: "center" }}>{item['個数']}</td>
+                  <td>{item['JANコード']}</td>
+                  <td>{item['商品コード']}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
