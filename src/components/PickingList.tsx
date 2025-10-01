@@ -13,17 +13,6 @@ interface Props {
   onDataCalculated: (list: PickingItemRow[], total: number) => void;
 }
 
-/**
- * ASIN変換ルールを管理するマップ。
- * 今後、新しい変換ルールはここに追加するだけで対応できます。
- * キー：変換元のASIN（必ず小文字で記述）
- * 値：変換先のASIN
- */
-const ASIN_TRANSFORMATION_MAP: { [key: string]: string } = {
-  // 例：'another-old-asin': 'another-new-asin',
-  'B0CCDGB44G': 'B0D11J69YH',
-};
-
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, onDataCalculated }) => {
   const { pickingList, totalSingleUnits } = useMemo(() => {
     const map = new Map<string, PickingItemRow>();
@@ -39,37 +28,34 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
       let lotUnit = 1;
       let productName = item['商品名'];
 
-      // 商品コードがCSVに存在する場合のみ、スプレッドシートを検索
-      const row = itemCode ? sheet.find((r) => r[16]?.toLowerCase() === itemCode.toLowerCase()) : undefined;
+      let targetRow: string[] | undefined = undefined;
 
-      if (row) {
-        // --- スプレッドシートに商品コードが見つかった場合の処理 ---
-        // 1. 最初に一致した行からASINを取得 (E列: index 4)
-        const originalAsin = row[4] || "";
-        const asin = ASIN_TRANSFORMATION_MAP[originalAsin] || originalAsin;
- 
-        // 2. 「ASIN(E列)」と「商品コード(P列)」の両方が一致する行を再検索
-        const lotRow = (asin && itemCode)
-          ? sheet.find(r =>
-              r[4]?.toLowerCase() === asin.toLowerCase() &&     // E列(index 4)がASINと一致
-              r[15]?.toLowerCase() === itemCode.toLowerCase()  // P列(index 15)が商品コードと一致
-            )
-          : undefined;
+      if (itemCode) {
+        // 1. CSVのitemCodeと一致する行をP列(index 15)からすべて検索
+        const matchingRowsByItemCode = sheet.filter(r => r[15]?.toLowerCase() === itemCode.toLowerCase());
 
-        // 3. lotRowが見つかれば、その行のロット入数(G列: index 6)を採用。見つからなければデフォルトの1のまま。
-        if (lotRow) {
-          lotUnit = parseInt(lotRow[6] || "1", 10);
+        // 2. 一致した行の数に応じて処理を分岐
+        if (matchingRowsByItemCode.length === 1) {
+          // 【Case 1】一致した行が1つだけの場合、その行をtargetRowとする
+          targetRow = matchingRowsByItemCode[0];
+
+        } else if (matchingRowsByItemCode.length > 1) {
+          // 【Case 2】一致した行が複数ある場合、その中から「ページ引継ぎ」のある行を探す
+          targetRow = matchingRowsByItemCode.find(r =>
+            r[12] === 'ページ引継ぎ' || r[12] === 'カタログ引継ぎ' || r[13] === 'ページ引継ぎ'
+          );
+          
         }
-
-        const foundJan = lotRow?.[5] || ""; // F列がJANコード
-
-        if (foundJan) {
-          jan = foundJan;
-          // R列(index 17)から商品名を取得
-          productName = lotRow?.[17] || item["商品名"];
-        }
+        // NOTE: 一致する行が0の場合、targetRowはundefinedのままとなり、後続の処理でデフォルト値が使われる
       }
-      // --- スプレッドシートにない場合は、デフォルト値がそのまま使われる ---
+
+      // 3. targetRowが見つかった場合、その行から必要な情報をすべて取得する
+      if (targetRow) {
+        const originalAsin = targetRow[4] || ""; // E列
+        lotUnit = parseInt(targetRow[6] || "1", 10); // G列
+        jan = targetRow[5] || "";                      // F列
+        productName = targetRow[17] || item["商品名"]; // R列
+      }
 
       const singleUnits = lotUnit * count;
 
