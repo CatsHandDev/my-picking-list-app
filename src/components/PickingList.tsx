@@ -112,7 +112,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
           <h2>ピッキングリスト</h2>
           {excludedItemsCount > 0 && (
             <div className="warning-box">
-              <strong>注意：</strong>ピッキング対象外の注文が {excludedItemsCount} 件あります。詳細を確認してください。
+              <strong>注意：</strong>リストアップ対象外の注文が {excludedItemsCount} 件あります。詳細を確認してください。
             </div>
           )}
         </div>
