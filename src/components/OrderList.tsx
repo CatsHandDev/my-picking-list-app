@@ -3,20 +3,31 @@ import type { OrderItem } from '../types';
 
 interface Props {
   data: OrderItem[];
+  sheet: string[][];
 }
 
-const OrderList: React.FC<Props> = ({ data }) => {
-  const excludedItemsCount = data.filter(item => !item['商品URL'] || item['商品URL'].trim() === '').length;
+const OrderList: React.FC<Props> = ({ data, sheet }) => {
+  // 商品コードがシートのQ列に存在しないアイテムをカウント
+  const excludedItemsCount = data.filter(item => {
+    const itemCode = item['商品コード'];
+    // 商品コード自体がない場合は除外
+    if (!itemCode || itemCode.trim() === '') {
+      return true;
+    }
+    // シートのQ列(index 16)に商品コードが存在しないものを探す
+    const isFoundInSheet = sheet.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase());
+    return !isFoundInSheet; // 見つからなければ true (除外対象)
+  }).length;
 
   return (
-    <div className="list-wrapper"> 
+    <div className="list-wrapper">
       {/* 1. 固定したいヘッダー部分 (スクロールするコンテナの外に出す) */}
       <div className="list-header">
         <h2>注文リスト</h2>
         <span>総注文件数: {data.length}件</span>
         {excludedItemsCount > 0 && (
           <span className="warning-text">
-            ※うち1件はピッキング対象外（商品URLが空値）
+            ※うち{excludedItemsCount}件はピッキング対象外(商品SKUが存在しない)
           </span>
         )}
       </div>
@@ -39,7 +50,15 @@ const OrderList: React.FC<Props> = ({ data }) => {
           </thead>
           <tbody>
             {data.map((item, index) => {
-              const isExcluded = !item['商品URL'] || item['商品URL'].trim() === '';
+              const itemCode = item['商品コード'];
+              let isExcluded = false;
+              if (!itemCode || itemCode.trim() === '') {
+                isExcluded = true;
+              } else {
+                const isFoundInSheet = sheet.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase());
+                isExcluded = !isFoundInSheet;
+              }
+
               return (
                 <tr key={`${item.受注番号}-${index}`} className={isExcluded ? 'excluded-row' : ''}>
                   <td>{item['注文日時']}</td>

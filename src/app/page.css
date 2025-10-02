@@ -37,6 +37,7 @@ body {
 .controls {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 /* カスタムファイルアップロードボタンのスタイル */
@@ -174,7 +175,7 @@ button:disabled {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-size: 12px;
-  
+
   /* Flexboxを使ってヘッダーとスクロールエリアを縦に並べる */
   display: flex;
   flex-direction: column;
@@ -189,19 +190,20 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-bottom: 15px; /* テーブルとの間に少し余白 */
-  
+  margin-bottom: 15px;
+  /* テーブルとの間に少し余白 */
+
   /* このヘッダーは縮まないようにする */
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 /* スクロールするコンテナのスタイル */
 .list-scroller {
   /* 縦方向にスクロールバーを表示 */
   overflow-y: auto;
-  
+
   /* 残りの利用可能な高さをすべて使う */
-  flex-grow: 1; 
+  flex-grow: 1;
 
   /* スムーズなスクロールのための推奨設定 */
   -webkit-overflow-scrolling: touch;
@@ -213,7 +215,7 @@ button:disabled {
 .list-scroller th {
   position: sticky;
   top: -1;
-  background-color: #f2f2f2; 
+  background-color: #f2f2f2;
   z-index: 1;
 }
 
@@ -223,7 +225,7 @@ button:disabled {
 
 .picking-header {
   margin-bottom: 10px;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .picking-header h2 {
@@ -232,13 +234,18 @@ button:disabled {
 
 .warning-box {
   height: fit-content;
-  background-color: #fffbe6; /* 注文リストの除外行と同じ薄い黄色 */
-  border: 1px solid #ffc107; /* 少し濃い黄色のボーダー */
-  border-left: 5px solid #d93025; /* 左側に警告を示す太い赤線 */
-  color: #5d4203; /* 暗めの文字色で可読性を確保 */
+  background-color: #fffbe6;
+  /* 注文リストの除外行と同じ薄い黄色 */
+  border: 1px solid #ffc107;
+  /* 少し濃い黄色のボーダー */
+  border-left: 5px solid #d93025;
+  /* 左側に警告を示す太い赤線 */
+  color: #5d4203;
+  /* 暗めの文字色で可読性を確保 */
   padding: 5px 8px;
   border-radius: 4px;
-  font-size: 14px; /* 少し大きめのフォント */
+  font-size: 14px;
+  /* 少し大きめのフォント */
   font-weight: 500;
 }
 
@@ -326,12 +333,14 @@ tfoot .footer-row {
 
 /* ピッキング対象外の注文行の背景色 */
 .excluded-row {
-  background-color: #ffb4a1 !important; /* 薄い黄色。!importantで他のスタイルを上書き */
+  background-color: #ffb4a1 !important;
+  /* 薄い黄色。!importantで他のスタイルを上書き */
 }
 
 /* ヘッダーの警告テキストのスタイル */
 .warning-text {
-  color: #d93025; /* 警告を示す赤色 */
+  color: #d93025;
+  /* 警告を示す赤色 */
   font-weight: bold;
 }
 

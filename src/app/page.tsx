@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import Papa from 'papaparse';
 import OrderList from '../components/OrderList';
 import PickingList from '../components/PickingList';
@@ -9,15 +9,24 @@ import type { OrderItem, PickingItemRow } from '../types';
 import { useReactToPrint } from 'react-to-print';
 import { useSheetData } from '../hooks/useSheetData';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import { useSheetNames } from '../hooks/useSheetNames';
 import './page.css';
 
 function Home() {
   const [data, setData] = useState<OrderItem[]>([]);
   const [view, setView] = useState<'order' | 'picking'>('order');
-  const [, setFileName] = useState<string>('');
+  const [fileName, setFileName] = useState<string>('');
   const [loadedAt, setLoadedAt] = useState<string>('');
   const [shippingMethod, setShippingMethod] = useState<string>('');
   const { sheetData, loading, error } = useSheetData();
+  const { sheetNames } = useSheetNames();
+
+  useEffect(() => {
+    // sheetNamesが空でなく、中身がある場合のみログを出力
+    if (sheetNames.length > 0) {
+      console.log("取得したシート名一覧:", sheetNames);
+    }
+  }, [sheetNames]); // sheetNamesが変更されたときに実行
 
   const printRef = useRef<HTMLDivElement>(null);
   const [pickingData, setPickingData] = useState<{ list: PickingItemRow[], total: number }>({ list: [], total: 0 });
@@ -28,10 +37,23 @@ function Home() {
   });
 
   const validDataForPicking = useMemo(() => {
-    // 商品URLが存在し、かつ空文字列でないものを抽出
-    return data.filter(item => item['商品URL'] && item['商品URL'].trim() !== '');
-  }, [data]); // dataが変更されたときだけ再計算される
-  
+    // sheetDataがまだ読み込まれていない場合は空配列を返す
+    if (!sheetData || sheetData.length === 0) {
+      return [];
+    }
+    return data.filter(item => {
+      const itemCode = item['商品コード'];
+      // 商品コードがない注文は対象外
+      if (!itemCode || itemCode.trim() === '') {
+        return false;
+      }
+      // シートのQ列(index 16)に商品コードが存在するかどうかをチェック
+      const isFoundInSheet = sheetData.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase());
+
+      return isFoundInSheet; // 存在すれば true (ピッキング対象)
+    });
+  }, [data, sheetData]);
+
   // 除外されたアイテムの数を計算
   const excludedItemsCount = useMemo(() => {
     return data.length - validDataForPicking.length;
@@ -103,6 +125,7 @@ function Home() {
       <header className="App-header">
         <h1 className="header-title">SR！３秒ピッキング</h1>
         <div className="controls">
+          <span>{fileName}</span>
           <label htmlFor="csv-upload" className="file-upload-label">
             <UploadFileIcon />
             <span>CSVファイルを選択</span>
@@ -134,7 +157,7 @@ function Home() {
 
           <div className="content">
             {view === 'order' ? (
-              <OrderList data={data} />
+              <OrderList data={data} sheet={sheetData} />
             ) : (
               <>
                 {/* 1. 画面表示用のコンポーネント */}

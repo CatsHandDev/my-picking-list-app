@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
-import { log } from "console";
 
 interface Props {
   data: OrderItem[];
@@ -31,27 +30,36 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
       let targetRow: string[] | undefined = undefined;
 
       if (itemCode) {
-        // 1. CSVのitemCodeと一致する行をP列(index 15)からすべて検索
-        const matchingRowsByItemCode = sheet.filter(r => r[15]?.toLowerCase() === itemCode.toLowerCase());
+        // 1. itemCodeをQ列(index 16)から検索して、最初の基準行(qRow)を見つける
+        const qRow = sheet.find(r => r[16]?.toLowerCase() === itemCode.toLowerCase());
 
-        // 2. 一致した行の数に応じて処理を分岐
-        if (matchingRowsByItemCode.length === 1) {
-          // 【Case 1】一致した行が1つだけの場合、その行をtargetRowとする
-          targetRow = matchingRowsByItemCode[0];
+        // qRowが見つかった場合のみ、P列の検索に進む
+        if (qRow) {
+          // 2. itemCodeをP列(index 15)から検索して、一致するすべての行(pRows)を見つける
+          const pRows = sheet.filter(r => r[15]?.toLowerCase() === itemCode.toLowerCase());
 
-        } else if (matchingRowsByItemCode.length > 1) {
-          // 【Case 2】一致した行が複数ある場合、その中から「ページ引継ぎ」のある行を探す
-          targetRow = matchingRowsByItemCode.find(r =>
-            r[12] === 'ページ引継ぎ' || r[12] === 'カタログ引継ぎ' || r[13] === 'ページ引継ぎ'
-          );
-          
+          // 3. P列でのヒット数に応じてロジックを分岐
+          if (pRows.length === 0) {
+            // P列にヒットしなかった場合：qRowをtargetRowとする
+            targetRow = qRow;
+
+          } else if (pRows.length === 1) {
+            // P列に1つヒットした場合：それがqRowと同じ行なら、それをtargetRowとする
+            const theOnePRow = pRows[0];
+            if (theOnePRow === qRow) {
+              targetRow = theOnePRow;
+            }
+
+          } else if (pRows.length >= 2) {
+            // P列に2つ以上ヒットした場合：qRowと異なる行をtargetRowとする
+            // (複数ある場合は最初に見つかった方)
+            targetRow = pRows.find(pRow => pRow !== qRow);
+          }
         }
-        // NOTE: 一致する行が0の場合、targetRowはundefinedのままとなり、後続の処理でデフォルト値が使われる
       }
 
-      // 3. targetRowが見つかった場合、その行から必要な情報をすべて取得する
+      // 4. 最終的に決定したtargetRowから必要な情報を取得する
       if (targetRow) {
-        const originalAsin = targetRow[4] || ""; // E列
         lotUnit = parseInt(targetRow[6] || "1", 10); // G列
         jan = targetRow[5] || "";                      // F列
         productName = targetRow[17] || item["商品名"]; // R列
@@ -102,7 +110,7 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
             </div>
           )}
         </div>
-        
+
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span><strong>配送方法:</strong> {shippingMethod}</span>
           <span><strong>ファイル読み込み日時:</strong> {loadedAt}</span>
