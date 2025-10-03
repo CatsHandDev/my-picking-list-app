@@ -89,8 +89,8 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
     const list = Array.from(map.values());
 
     // 商品名でリストを昇順にソートする
-    list.sort((a, b) => a.商品名.localeCompare(b.商品名, 'ja'));
-
+    // list.sort((a, b) => a.商品名.localeCompare(b.商品名, 'ja'));
+    
     const totalSingles = list.reduce((sum, item) => sum + item.単品換算数, 0);
 
     return { pickingList: list, totalSingleUnits: totalSingles };

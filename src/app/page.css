@@ -438,7 +438,7 @@ tfoot .footer-row {
 
   body * {
     visibility: visible;
-    font-size: 12px;
+    font-size: 8px;
     font-weight: bold;
   }
 
@@ -469,6 +469,30 @@ tfoot .footer-row {
     margin-block: 0;
   }
 
+  .printable-container table:nth-of-type(2) {
+    /* テーブル間のボーダーが二重にならないように */
+    border-collapse: collapse;
+  }
+
+  .printable-container table:nth-of-type(2) tbody tr {
+    /* ページ途中での改行を防ぐ（既存の設定ですが、念のため） */
+    page-break-inside: avoid !important;
+  }
+
+  /* 印刷用のテーブルボディ内の偶数行(tr)に背景色を適用 */
+  .printable-container table:nth-of-type(2) tbody tr:nth-child(even) {
+    background-color: #e0e0e0 !important;
+  }
+
+  /* ヘッダーとフッターの背景色が優先されるように確認 */
+  thead tr,
+  .footer-row {
+    background-color: #ddd !important;
+  }
+
+  .footer-row {
+    background-color: #ddd !important;
+  }
 
   /* テーブルの改ページ制御 */
   table {
@@ -478,6 +502,7 @@ tfoot .footer-row {
 
   thead {
     display: table-header-group;
+    background-color: #e6e6e6;
   }
 
   tbody {
@@ -488,12 +513,14 @@ tfoot .footer-row {
     /* 行の途中で改ページされるのを防ぐ（重要） */
     page-break-inside: avoid !important;
     page-break-after: auto;
+    border-top: 0;
+    background-color: #f2f2f2;
   }
 
   th, td {
     width: fit-content;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid #999;
   }
 
   .check, .count, .case, .box, .other {
@@ -502,8 +529,12 @@ tfoot .footer-row {
     text-align: center;
   }
 
+  .check {
+    width: 3%;
+   }
+
   .jan {
-    width: 7%;
+    width: 5%;
     text-align: center;
   }
 
@@ -515,5 +546,10 @@ tfoot .footer-row {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  tfoot .footer-row {
+    font-weight: bold;
+    background-color: #e6e6e6;
   }
 }
