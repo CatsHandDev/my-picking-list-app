@@ -20,6 +20,7 @@ function Home() {
   const [shippingMethod, setShippingMethod] = useState<string>('');
   const { sheetData, loading, error } = useSheetData();
   const { sheetNames } = useSheetNames();
+  const [shippingNotes, setShippingNotes] = useState<string[]>([]);
 
   useEffect(() => {
     // sheetNamesが空でなく、中身がある場合のみログを出力
@@ -83,6 +84,18 @@ function Home() {
           });
           return newRow as OrderItem;
         });
+
+        const notes = new Set<string>();
+        processedData.forEach(row => {
+          // C列のヘッダー名 'チェック項目' を使用
+          const note = row['チェック項目'];
+          // noteが存在し、かつ空文字列でない場合のみSetに追加
+          if (note && note.trim() !== '') {
+            notes.add(note.trim());
+          }
+        });
+        // Setを配列に変換してstateを更新
+        setShippingNotes(Array.from(notes));
 
         setData(processedData);
         if (processedData.length > 0) {
@@ -168,6 +181,7 @@ function Home() {
                   loadedAt={loadedAt}
                   sheet={sheetData}
                   onDataCalculated={onDataCalculated}
+                  shippingNotes={shippingNotes}
                 />
 
                 {/* 2. 印刷専用の非表示コンポーネント */}

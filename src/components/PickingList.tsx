@@ -5,6 +5,7 @@ import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 interface Props {
   data: OrderItem[];
   shippingMethod: string;
+  shippingNotes: string[];
   loadedAt: string;
   /** Google Sheets の2次元配列（E列=ASIN, F列=JAN, G列=ロット入数, P列=商品コード, Q列=商品コード, R列=商品名） */
   sheet: string[][];
@@ -12,7 +13,7 @@ interface Props {
   onDataCalculated: (list: PickingItemRow[], total: number) => void;
 }
 
-const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, onDataCalculated }) => {
+const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, shippingNotes, onDataCalculated }) => {
   const { pickingList, totalSingleUnits } = useMemo(() => {
     const map = new Map<string, PickingItemRow>();
 
@@ -112,7 +113,15 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span><strong>配送方法:</strong> {shippingMethod}</span>
+          <span>
+            <strong>配送方法:</strong> {shippingMethod}
+            {/* shippingNotesに中身がある場合のみ表示 */}
+            {shippingNotes.length > 0 && (
+              <span className="shipping-notes">
+                {' - '}{shippingNotes.join(', ')}{' - '}
+              </span>
+            )}
+          </span>
           <span><strong>ファイル読み込み日時:</strong> {loadedAt}</span>
         </div>
       </div>
