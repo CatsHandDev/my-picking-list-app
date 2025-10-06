@@ -77,6 +77,9 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
       } else {
         lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : 1;
       }
+
+
+      
       
       const singleUnits = lotUnit * count;
 
