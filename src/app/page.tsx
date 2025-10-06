@@ -38,20 +38,20 @@ function Home() {
   });
 
   const validDataForPicking = useMemo(() => {
-    // sheetDataがまだ読み込まれていない場合は空配列を返す
     if (!sheetData || sheetData.length === 0) {
       return [];
     }
+    // OrderListと全く同じロジックに修正
     return data.filter(item => {
       const itemCode = item['商品コード'];
-      // 商品コードがない注文は対象外
-      if (!itemCode || itemCode.trim() === '') {
-        return false;
-      }
-      // シートのQ列(index 16)に商品コードが存在するかどうかをチェック
-      const isFoundInSheet = sheetData.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase());
+      const itemSku = item['商品SKU'];
 
-      return isFoundInSheet; // 存在すれば true (ピッキング対象)
+      // 商品コードまたは商品SKUがシートのQ列に存在すれば、それは有効なデータ
+      const isFound =
+        (itemCode && sheetData.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase())) ||
+        (itemSku && sheetData.some(row => row[16]?.toLowerCase() === itemSku.toLowerCase()));
+
+      return isFound; // isFoundがtrueのものがピッキング対象
     });
   }, [data, sheetData]);
 

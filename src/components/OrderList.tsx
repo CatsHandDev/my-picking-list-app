@@ -7,17 +7,21 @@ interface Props {
 }
 
 const OrderList: React.FC<Props> = ({ data, sheet }) => {
-  // 商品コードがシートのQ列に存在しないアイテムをカウント
-  const excludedItemsCount = data.filter(item => {
+  // 除外対象 = 商品コードと商品SKUの両方がシートのQ列に存在しないアイテム
+  const excludedItems = data.filter(item => {
     const itemCode = item['商品コード'];
-    // 商品コード自体がない場合は除外
-    if (!itemCode || itemCode.trim() === '') {
-      return true;
-    }
-    // シートのQ列(index 16)に商品コードが存在しないものを探す
-    const isFoundInSheet = sheet.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase());
-    return !isFoundInSheet; // 見つからなければ true (除外対象)
-  }).length;
+    const itemSku = item['商品SKU']; // 商品SKUを取得
+
+    // an item is "found" if either its itemCode or itemSku exists in column Q.
+    const isFound =
+      (itemCode && sheet.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase())) ||
+      (itemSku && sheet.some(row => row[16]?.toLowerCase() === itemSku.toLowerCase()));
+
+    // It's excluded if it's NOT found.
+    return !isFound;
+  });
+
+  const excludedItemsCount = excludedItems.length;
 
   return (
     <div className="list-wrapper">
@@ -51,13 +55,13 @@ const OrderList: React.FC<Props> = ({ data, sheet }) => {
           <tbody>
             {data.map((item, index) => {
               const itemCode = item['商品コード'];
-              let isExcluded = false;
-              if (!itemCode || itemCode.trim() === '') {
-                isExcluded = true;
-              } else {
-                const isFoundInSheet = sheet.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase());
-                isExcluded = !isFoundInSheet;
-              }
+              const itemSku = item['商品SKU'];
+
+              const isFound =
+                (itemCode && sheet.some(row => row[16]?.toLowerCase() === itemCode.toLowerCase())) ||
+                (itemSku && sheet.some(row => row[16]?.toLowerCase() === itemSku.toLowerCase()));
+
+              const isExcluded = !isFound;
 
               return (
                 <tr key={`${item.受注番号}-${index}`} className={isExcluded ? 'excluded-row' : ''}>
