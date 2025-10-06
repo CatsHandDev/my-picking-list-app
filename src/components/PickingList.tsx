@@ -13,6 +13,19 @@ interface Props {
   onDataCalculated: (list: PickingItemRow[], total: number) => void;
 }
 
+/**
+ * SKU管理番号からロット入数を取得するための許可リスト。
+ * キー：許可するSKU管理番号の文字列
+ * 値：対応するロット入数の数値
+ * 今後、許可するSKUが増えた場合は、このオブジェクトに追記するだけでOKです。
+ */
+const SKU_LOT_UNIT_MAP: { [key: string]: number } = {
+  "-2": 2,
+  "-4": 4,
+  "-6": 6,
+  // 例: "-8": 8,
+};
+
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, shippingNotes, onDataCalculated }) => {
   const { pickingList, totalSingleUnits } = useMemo(() => {
     const map = new Map<string, PickingItemRow>();
@@ -28,44 +41,43 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
       let lotUnit = 1;
       let productName = item['商品名'];
 
+      // --- STEP 1: CSVのSKU管理番号が「許可リスト」に存在するかチェック ---
+      let lotUnitOverride: number | undefined = undefined;
+      const sku = item['SKU管理番号'];
+
+      // SKUが許可リストのキーとして存在する場合、対応する値を取得
+      if (sku && SKU_LOT_UNIT_MAP[sku]) {
+        lotUnitOverride = SKU_LOT_UNIT_MAP[sku];
+      }
+      
+      // --- STEP 2: 従来のスプレッドシート検索ロジック (変更なし) ---
       let targetRow: string[] | undefined = undefined;
-
       if (itemCode) {
-        // 1. itemCodeをQ列(index 16)から検索して、最初の基準行(qRow)を見つける
         const qRow = sheet.find(r => r[16]?.toLowerCase() === itemCode.toLowerCase());
-
-        // qRowが見つかった場合のみ、P列の検索に進む
         if (qRow) {
-          // 2. itemCodeをP列(index 15)から検索して、一致するすべての行(pRows)を見つける
           const pRows = sheet.filter(r => r[15]?.toLowerCase() === itemCode.toLowerCase());
-
-          // 3. P列でのヒット数に応じてロジックを分岐
           if (pRows.length === 0) {
-            // P列にヒットしなかった場合：qRowをtargetRowとする
             targetRow = qRow;
-
           } else if (pRows.length === 1) {
-            // P列に1つヒットした場合：それがqRowと同じ行なら、それをtargetRowとする
-            const theOnePRow = pRows[0];
-            if (theOnePRow === qRow) {
-              targetRow = theOnePRow;
+            if (pRows[0] === qRow) {
+              targetRow = pRows[0];
             }
-
           } else if (pRows.length >= 2) {
-            // P列に2つ以上ヒットした場合：qRowと異なる行をtargetRowとする
-            // (複数ある場合は最初に見つかった方)
             targetRow = pRows.find(pRow => pRow !== qRow);
           }
         }
       }
 
-      // 4. 最終的に決定したtargetRowから必要な情報を取得する
+      // --- STEP 3: 最終的なロット入数と商品情報を決定 (変更なし) ---
       if (targetRow) {
-        lotUnit = parseInt(targetRow[6] || "1", 10); // G列
-        jan = targetRow[5] || "";                      // F列
-        productName = targetRow[17] || item["商品名"]; // R列
+        const lotUnitFromSheet = parseInt(targetRow[6] || "1", 10);
+        jan = targetRow[5] || "";
+        productName = targetRow[17] || item["商品名"];
+        lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : lotUnitFromSheet;
+      } else {
+        lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : 1;
       }
-
+      
       const singleUnits = lotUnit * count;
 
       // 集計用のキーを決定。JANコードがあればJANを、なければ商品名を使用する

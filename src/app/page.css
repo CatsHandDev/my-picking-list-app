@@ -278,6 +278,11 @@ tbody tr:nth-child(even) {
   text-align: center;
 }
 
+.jan, .count {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .check {
   width: 3%;
 }
