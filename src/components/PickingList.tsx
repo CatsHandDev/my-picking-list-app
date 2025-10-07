@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
+import { usePickingLogic } from "../hooks/usePickingLogic";
 
 interface Props {
   data: OrderItem[];
@@ -13,118 +14,9 @@ interface Props {
   onDataCalculated: (list: PickingItemRow[], total: number) => void;
 }
 
-/**
- * SKU管理番号からロット入数を取得するための許可リスト。
- * キー：許可するSKU管理番号の文字列
- * 値：対応するロット入数の数値
- * 今後、許可するSKUが増えた場合は、このオブジェクトに追記するだけでOKです。
- */
-const SKU_LOT_UNIT_MAP: { [key: string]: number } = {
-  "-2": 2,
-  "-4": 4,
-  "-6": 6,
-  // 例: "-8": 8,
-};
-
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, shippingNotes, onDataCalculated }) => {
-  const { pickingList, totalSingleUnits } = useMemo(() => {
-    const map = new Map<string, PickingItemRow>();
-
-    data.forEach((item) => {
-      const itemCode = item["商品コード"];
-      const itemSku = item["商品SKU"];
-      const count = parseInt(item["個数"], 10) || 0;
-      if (count === 0) return;
-
-      let jan = "";
-      let lotUnit = 1;
-      let productName = item['商品名'];
-
-      let targetRow: string[] | undefined = undefined;
-
-      // ▼▼▼ ここから仕様に合わせたロジックを再構築 ▼▼▼
-
-      if (itemCode) {
-        // --- Step 1: P列(index 15)で一次検索 ---
-        const pRows = sheet.filter(r => r[15]?.toLowerCase() === itemCode.toLowerCase());
-
-        // フォールバック用の関数を定義 (itemSkuでQ列を検索)
-        const findRowBySkuInQ = () => itemSku ? sheet.find(r => r[16]?.toLowerCase() === itemSku.toLowerCase()) : undefined;
-
-        // --- Step 2: P列のヒット数で分岐 ---
-        if (pRows.length === 0) {
-          // Case A: P列にヒットなし -> フォールバック
-          targetRow = findRowBySkuInQ();
-
-        } else if (pRows.length === 1) {
-          // Case B: P列に1件ヒット
-          const theOnePRow = pRows[0];
-          if (theOnePRow[16]?.toLowerCase() === itemCode.toLowerCase()) {
-            // Q列の値がitemCodeと一致 -> この行を採用
-            targetRow = theOnePRow;
-          } else {
-            // Q列の値が不一致 -> フォールバック
-            targetRow = findRowBySkuInQ();
-          }
-
-        } else if (pRows.length >= 2) {
-          // Case C: P列に2件以上ヒット (新旧パッケージの可能性)
-          const qRowBySku = findRowBySkuInQ(); // まずitemSkuでQ列を検索
-          if (qRowBySku) {
-            // const handoverText = qRowBySku[12] || qRowBySku[13] || "";
-            // if (handoverText === 'ページ引継ぎ' || handoverText === 'カタログ引継ぎ') {
-              // 引継ぎ情報があれば、この行(新パッケージ)を採用
-              targetRow = qRowBySku;
-            // }
-          }
-        }
-      } else {
-        // itemCode自体がCSVにない場合もフォールバックを試みる
-        const findRowBySkuInQ = () => itemSku ? sheet.find(r => r[16]?.toLowerCase() === itemSku.toLowerCase()) : undefined;
-        targetRow = findRowBySkuInQ();
-      }
-
-      // --- Step 3: 最終的なロット入数と商品情報を決定 ---
-      // SKUによるロット入数の上書きロジック
-      let lotUnitOverride: number | undefined = undefined;
-      const skuFromCsv = item['SKU管理番号'];
-      if (skuFromCsv && SKU_LOT_UNIT_MAP[skuFromCsv]) {
-        lotUnitOverride = SKU_LOT_UNIT_MAP[skuFromCsv];
-      }
-
-      if (targetRow) {
-        const lotUnitFromSheet = parseInt(targetRow[6] || "1", 10);
-        jan = targetRow[5] || "";
-        productName = targetRow[17] || item["商品名"];
-        lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : lotUnitFromSheet;
-      } else {
-        lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : 1;
-      }
-
-      // ▲▲▲ ここまで ▲▲▲
-
-      const singleUnits = lotUnit * count;
-      const mapKey = jan || productName;
-
-      if (map.has(mapKey)) {
-        const ex = map.get(mapKey)!;
-        ex.個数 += count;
-        ex.単品換算数 += singleUnits;
-      } else {
-        map.set(mapKey, {
-          商品名: productName,
-          JANコード: jan,
-          個数: count,
-          単品換算数: singleUnits,
-        });
-      }
-    });
-
-    const list = Array.from(map.values());
-    const totalSingles = list.reduce((sum, item) => sum + item.単品換算数, 0);
-    return { pickingList: list, totalSingleUnits: totalSingles };
-  }, [data, sheet]);
-
+  const { pickingList, totalSingleUnits } = usePickingLogic(data, sheet);
+  
   useEffect(() => {
     onDataCalculated(pickingList, totalSingleUnits);
   }, [pickingList, totalSingleUnits, onDataCalculated]);

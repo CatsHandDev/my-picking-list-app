@@ -14,7 +14,7 @@ import './page.css';
 
 function Home() {
   const [data, setData] = useState<OrderItem[]>([]);
-  const [view, setView] = useState<'order' | 'picking'>('order');
+  const [view, setView] = useState<'order' | 'multi' | 'picking'>('order');
   const [fileName, setFileName] = useState<string>('');
   const [loadedAt, setLoadedAt] = useState<string>('');
   const [shippingMethod, setShippingMethod] = useState<string>('');
@@ -59,6 +59,12 @@ function Home() {
   const excludedItemsCount = useMemo(() => {
     return data.length - validDataForPicking.length;
   }, [data, validDataForPicking]);
+
+  // 個数が2個以上の注文データだけをフィルタリング
+  const multiItemOrders = useMemo(() => {
+    // parseIntで文字列の'個数'を数値に変換して比較
+    return data.filter(item => (parseInt(item['個数'], 10) || 0) >= 2);
+  }, [data]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -158,6 +164,7 @@ function Home() {
           <div className="navigation">
             <div className="nav-tabs">
               <button onClick={() => setView('order')} disabled={view === 'order'}>注文リスト</button>
+              <button onClick={() => setView('multi')} disabled={view === 'multi'}>複数個注文</button>
               <button onClick={() => setView('picking')} disabled={view === 'picking'}>ピッキングリスト</button>
             </div>
 
@@ -170,7 +177,10 @@ function Home() {
 
           <div className="content">
             {view === 'order' ? (
-              <OrderList data={data} sheet={sheetData} />
+              <OrderList data={data} sheet={sheetData} title="注文リスト" />
+            ) : view === 'multi' ? (
+              // 新しいタブ用の表示。OrderListを再利用し、フィルタリングしたデータを渡す
+              <OrderList data={multiItemOrders} sheet={sheetData} title="複数個注文リスト" />
             ) : (
               <>
                 {/* 1. 画面表示用のコンポーネント */}

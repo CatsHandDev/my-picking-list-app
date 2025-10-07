@@ -4,9 +4,10 @@ import type { OrderItem } from '../types';
 interface Props {
   data: OrderItem[];
   sheet: string[][];
+  title: string;
 }
 
-const OrderList: React.FC<Props> = ({ data, sheet }) => {
+const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
   // 除外対象 = 商品コードと商品SKUの両方がシートのQ列に存在しないアイテム
   const excludedItems = data.filter(item => {
     const itemCode = item['商品コード'];
@@ -27,7 +28,7 @@ const OrderList: React.FC<Props> = ({ data, sheet }) => {
     <div className="list-wrapper">
       {/* 1. 固定したいヘッダー部分 (スクロールするコンテナの外に出す) */}
       <div className="list-header">
-        <h2>注文リスト</h2>
+        <h2>{title}</h2>
         <span>総注文件数: {data.length}件</span>
         {excludedItemsCount > 0 && (
           <span className="warning-text">
