@@ -1,4 +1,5 @@
 import React from 'react';
+import type { OrderItem } from '../types';
 
 // PickingListから型定義などを再利用
 interface RowData {
@@ -12,11 +13,13 @@ interface PrintableProps {
   shippingMethod: string;
   loadedAt: string;
   totalSingleUnits: number;
+  multiItemOrders: OrderItem[];
+  shippingNotes: string[];
 }
 
 // forwardRef を使って親から ref を受け取れるようにする
 const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
-  ({ pickingList, shippingMethod, loadedAt, totalSingleUnits }, ref) => {
+  ({ pickingList, shippingMethod, loadedAt, totalSingleUnits, multiItemOrders, shippingNotes }, ref) => {
     return (
       // ref はこの一番外側の div に設定する
       <div ref={ref} className="printable-container">
@@ -24,6 +27,11 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
           <h2>ピッキングリスト</h2>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span><strong>配送方法:</strong> {shippingMethod}</span>
+            {shippingNotes.length > 0 && (
+              <span className="shipping-notes">
+                {' - '}{shippingNotes.join(', ')}{' - '}
+              </span>
+            )}
             <span><strong>ファイル読み込み日時:</strong> {loadedAt}</span>
           </div>
         </div>
@@ -88,6 +96,37 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
             </tr>
           </tfoot>
         </table>
+
+        {/* 複数個注文が1件以上ある場合のみ、このセクションを描画 */}
+        {multiItemOrders.length > 0 && (
+          <div className="multi-order-list-container">
+            <h2>複数個注文リスト</h2>
+            <table className="print-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '10%' }}>GoQ管理番号</th>
+                  <th style={{ width: '15%' }}>受注番号</th>
+                  <th style={{ width: '15%' }}>注文者氏名</th>
+                  <th style={{ width: '40%' }}>商品名</th>
+                  <th style={{ width: '5%' }}>個数</th>
+                  <th style={{ width: '15%' }}>JANコード</th>
+                </tr>
+              </thead>
+              <tbody>
+                {multiItemOrders.map((item, index) => (
+                  <tr key={`${item.受注番号}-${index}`}>
+                    <td>{item['GoQ管理番号']}</td>
+                    <td>{item['受注番号']}</td>
+                    <td>{item['送付先氏名']}</td>
+                    <td>{item['商品名']}</td>
+                    <td style={{ textAlign: 'center' }}>{item['個数']}</td>
+                    <td>{item['JANコード']}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     );
   }

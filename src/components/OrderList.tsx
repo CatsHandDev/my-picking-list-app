@@ -46,7 +46,7 @@ const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
               <th style={{ width: "2%" }}>配送方法</th>
               <th style={{ width: "3%" }}>GoQ管理番号</th>
               <th>受注番号</th>
-              <th style={{ width: "4%" }}>注文者氏名</th>
+              <th style={{ width: "4%" }}>送付先氏名</th>
               <th style={{ width: "15%" }}>商品名</th>
               <th style={{ width: "2%" }}>個数</th>
               <th style={{ width: "4%" }}>JANコード</th>
@@ -70,7 +70,7 @@ const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
                   <td>{item['配送方法(複数配送先)']}</td>
                   <td>{item['GoQ管理番号']}</td>
                   <td>{item['受注番号']}</td>
-                  <td>{item['注文者氏名']}</td>
+                  <td>{item['送付先氏名']}</td>
                   <td className="itemName">{item['商品名']}</td>
                   <td style={{ textAlign: "center" }}>{item['個数']}</td>
                   <td>{item['JANコード']}</td>

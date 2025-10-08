@@ -202,6 +202,8 @@ function Home() {
                     totalSingleUnits={pickingData.total}
                     shippingMethod={shippingMethod}
                     loadedAt={loadedAt}
+                    shippingNotes={shippingNotes}
+                    multiItemOrders={multiItemOrders}
                   />
                 </div>
               </>
