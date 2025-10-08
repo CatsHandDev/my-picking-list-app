@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import { usePickingLogic } from "../hooks/usePickingLogic";
@@ -16,7 +16,7 @@ interface Props {
 
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, shippingNotes, onDataCalculated }) => {
   const { pickingList, totalSingleUnits } = usePickingLogic(data, sheet);
-  
+
   useEffect(() => {
     onDataCalculated(pickingList, totalSingleUnits);
   }, [pickingList, totalSingleUnits, onDataCalculated]);
