@@ -142,7 +142,7 @@ function Home() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1 className="header-title">SR！３秒ピッキング</h1>
+        <h1 className="header-title">Smart Pick</h1>
         <div className="controls">
           <span>{fileName}</span>
           <label htmlFor="csv-upload" className="file-upload-label">
