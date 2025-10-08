@@ -106,7 +106,7 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                 <tr>
                   <th style={{ width: '10%' }}>GoQ管理番号</th>
                   <th style={{ width: '15%' }}>受注番号</th>
-                  <th style={{ width: '15%' }}>注文者氏名</th>
+                  <th style={{ width: '15%' }}>送付先氏名</th>
                   <th style={{ width: '40%' }}>商品名</th>
                   <th style={{ width: '5%' }}>個数</th>
                   <th style={{ width: '15%' }}>JANコード</th>
