@@ -47,33 +47,6 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
         </div>
       </div>
 
-      {/* 2. 作業記録エリア */}
-      <div className="work-log-grid">
-        {/* Row 1: Headers */}
-        <div className="grid-header">ピッキング</div>
-        <div className="grid-header">箱出し</div>
-        <div className="grid-header">梱包</div>
-
-        {/* Row 2: Body Items (12 items total) */}
-        {/* Group 1: ピッキング */}
-        <div className="grid-label col-span1">時間</div>
-        <div className="grid-input col-span5">~</div>
-        <div className="grid-label col-span1">個数</div>
-        <div className="grid-input col-span1">&nbsp;</div>
-        
-        {/* Group 2: 箱出し */}
-        <div className="grid-label col-span1">時間</div>
-        <div className="grid-input col-span5">~</div>
-        <div className="grid-label col-span1">個数</div>
-        <div className="grid-input col-span1">&nbsp;</div>
-
-        {/* Group 3: 梱包 */}
-        <div className="grid-label col-span1">時間</div>
-        <div className="grid-input col-span5">~</div>
-        <div className="grid-label col-span1">個数</div>
-        <div className="grid-input col-span1">&nbsp;</div>
-      </div>
-
       <div className="list-scroller">
         <table>
           <thead>
