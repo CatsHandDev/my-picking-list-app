@@ -10,7 +10,7 @@ interface RowData {
 }
 
 interface PrintableProps {
-  pickingList: RowData[];
+  pickingList: PickingItemRow[];
   shippingMethod: string;
   loadedAt: string;
   totalSingleUnits: number;
@@ -93,8 +93,24 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
               <tr key={`${item.JANコード}-${item.商品名}-${index}`}>
                 <td className="check" style={{ width: '3%' }}></td>
                 <td className="itemName" style={{ flex: 1 }}>{item.商品名}</td>
-                <td className="jan" style={{ width: '7%' }}>{item.JANコード ? item.JANコード.slice(-4) : ''}</td>
-                <td className="count" style={{ width: '5%' }}>{item.単品換算数}</td>
+                <td className="jan" style={{ width: '7%' }}>
+                  {item.JANコード ? item.JANコード.slice(-4) : ''}
+                  {item.親JANコード && (
+                    <>
+                      <br />
+                      <span>({item.親JANコード.slice(-4)})</span>
+                    </>
+                  )}
+                </td>
+                <td className="count" style={{ width: '5%' }}>
+                  {item.単品換算数}
+                  {item.親数量 && item.親数量 > 0 && (
+                    <>
+                      <br />
+                      <span className="parent-quantity">({item.親数量})</span>
+                    </>
+                  )}
+                </td>
                 <td className="case" style={{ width: '5%' }}></td>
                 <td className="box" style={{ width: '5%' }}></td>
                 <td className="other" style={{ width: '5%' }}></td>

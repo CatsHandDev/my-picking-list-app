@@ -87,13 +87,33 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
           </thead>
           <tbody>
             {pickingList.map((item, index) => (
-              <tr key={`${item.JANコード}-${index}`}>
+              <tr key={`${item.JANコード}-${item.商品名}-${index}`}>
                 <td></td>
                 <td className="itemName">{item.商品名}</td>
                 {/* JANコードは末尾4桁のみ表示 */}
-                <td className="jan">{item.JANコード.slice(-4)}</td>
+                <td className="jan">
+                  {/* 子JANの表示 */}
+                  {item.JANコード ? item.JANコード.slice(-4) : ''}
+                  {/* 親JANが存在する場合、改行して表示 */}
+                  {item.親JANコード && (
+                    <>
+                      <br />
+                      <span>({item.親JANコード.slice(-4)})</span>
+                    </>
+                  )}
+                </td>
                 {/* ロット入数 × 個数の単品換算合計 */}
-                <td className="count">{item.単品換算数}</td>
+                <td className="count">
+                  {/* 子商品の合計数量 */}
+                  {item.単品換算数}
+                  {/* 親数量が存在し、0より大きい場合のみ表示 */}
+                  {item.親数量 && item.親数量 > 0 && (
+                    <>
+                      <br />
+                      <span className="parent-quantity">({item.親数量})</span>
+                    </>
+                  )}
+                </td>
                 <td></td>
                 <td></td>
                 <td></td>

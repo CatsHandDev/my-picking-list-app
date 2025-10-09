@@ -27,8 +27,10 @@ export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
       if (count === 0) return;
 
       let jan = "";
+      let parentJan: string | undefined = undefined;
       let lotUnit = 1;
       let productName = item['商品名'];
+      let parentQuantity: number | undefined = undefined;
 
       // --- SKUによるロット入数の上書きロジック ---
       let lotUnitOverride: number | undefined = undefined;
@@ -62,6 +64,14 @@ export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
         const lotUnitFromSheet = parseInt(targetRow[6] || "1", 10);
         jan = targetRow[5] || "";
         productName = targetRow[17] || item["商品名"];
+        const parentAsin = targetRow[7]; // H列 (親ASIN)
+        // H列に親ASINが存在する場合のみ、I列(親JAN)を取得する
+        if (parentAsin && parentAsin.trim() !== '') {
+          parentJan = targetRow[8] || undefined; // I列 (親JAN)
+          // J列(index 9)から親ロット入数を取得。見つからなければ1とする
+          const parentLotUnit = parseInt(targetRow[9] || "1", 10);
+          parentQuantity = parentLotUnit * count;
+        }
         lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : lotUnitFromSheet;
       } else {
         lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : 1;
@@ -74,12 +84,15 @@ export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
         const ex = map.get(mapKey)!;
         ex.個数 += count;
         ex.単品換算数 += singleUnits;
+        ex.親数量 = (ex.親数量 || 0) + (parentQuantity || 0);
       } else {
         map.set(mapKey, {
           商品名: productName,
           JANコード: jan,
+          親JANコード: parentJan,
           個数: count,
           単品換算数: singleUnits,
+          親数量: parentQuantity,
         });
       }
     });

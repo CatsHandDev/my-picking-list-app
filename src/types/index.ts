@@ -29,8 +29,10 @@ export interface PickingItem {
 export interface PickingItemRow {
   商品名: string;
   JANコード: string;
+  親JANコード?: string;
   個数: number;
   単品換算数: number;
+  親数量?: number;
 }
 
 export const SKU_LOT_UNIT_MAP: { [key: string]: number } = {
