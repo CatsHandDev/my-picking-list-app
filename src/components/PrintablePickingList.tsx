@@ -1,5 +1,6 @@
 import React from 'react';
-import type { OrderItem } from '../types';
+import type { OrderItem, PickingItemRow } from "../types";
+import { SKU_LOT_UNIT_MAP } from "../types";
 
 // PickingListから型定義などを再利用
 interface RowData {

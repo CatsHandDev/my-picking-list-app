@@ -32,3 +32,9 @@ export interface PickingItemRow {
   個数: number;
   単品換算数: number;
 }
+
+export const SKU_LOT_UNIT_MAP: { [key: string]: number } = {
+  "-2": 2,
+  "-4": 4,
+  "-6": 6,
+};

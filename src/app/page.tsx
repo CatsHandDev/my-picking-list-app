@@ -10,6 +10,7 @@ import { useReactToPrint } from 'react-to-print';
 import { useSheetData } from '../hooks/useSheetData';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useSheetNames } from '../hooks/useSheetNames';
+import { SKU_LOT_UNIT_MAP } from '../types';
 import './page.css';
 
 function Home() {
@@ -62,8 +63,31 @@ function Home() {
 
   // 個数が2個以上の注文データだけをフィルタリング
   const multiItemOrders = useMemo(() => {
-    // parseIntで文字列の'個数'を数値に変換して比較
-    return data.filter(item => (parseInt(item['個数'], 10) || 0) >= 2);
+    // データを走査して、条件に合うものを新しい配列に格納する
+    const filteredAndMappedData = data
+      .map(item => {
+        const sku = item['SKU管理番号'];
+        
+        // SKUが特別リストに含まれているかチェック
+        if (sku && SKU_LOT_UNIT_MAP[sku]) {
+          // もし含まれていたら、新しいオブジェクトを作成し、'個数'プロパティを上書きする
+          // これにより元のdata配列を汚染しない（イミュータビリティの維持）
+          return {
+            ...item,
+            '個数': SKU_LOT_UNIT_MAP[sku].toString(), // 数値を文字列に変換して型を合わせる
+          };
+        }
+        
+        // SKUが特別リストにない場合は、元のアイテムをそのまま返す
+        return item;
+      })
+      .filter(item => {
+        // 変換後のデータを使って、個数が2個以上かどうかの最終チェック
+        const quantity = parseInt(item['個数'], 10) || 0;
+        return quantity >= 2;
+      });
+
+    return filteredAndMappedData;
   }, [data]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

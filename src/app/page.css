@@ -434,6 +434,25 @@ tfoot .footer-row {
   @page {
     size: A4;
     margin-block: 40px;
+
+    @top-center {
+      content: "";
+    }
+    @top-left {
+      content: "";
+    }
+    @top-right {
+      content: "";
+    }
+    @bottom-center {
+      content: "";
+    }
+    @bottom-left {
+      content: "";
+    }
+    @bottom-right {
+      content: "";
+    }
   }
 
   body {
