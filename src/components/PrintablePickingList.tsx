@@ -27,14 +27,48 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
         <div className="picking-header">
           <h2>ピッキングリスト</h2>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span><strong>配送方法:</strong> {shippingMethod}</span>
-            {shippingNotes.length > 0 && (
-              <span className="shipping-notes">
-                {' - '}{shippingNotes.join(', ')}{' - '}
-              </span>
-            )}
-            <span><strong>ファイル読み込み日時:</strong> {loadedAt}</span>
+            <div>
+              <span><strong>配送方法:</strong>{shippingMethod}</span>
+              {shippingNotes.length > 0 && (
+                <p className="shipping-notes">
+                  {' - '}{shippingNotes.join(', ')}{' - '}
+                </p>
+              )}
+              <br />
+              <span><strong>作成日時:</strong> {loadedAt}</span>
+            </div>
+            <div>
+              <span>実施者：　　　　　　<br/></span>
+              <span>確認者：</span>             
+            </div>
           </div>
+        </div>
+
+        {/* 2. 作業記録エリア */}
+        <div className="work-log-grid">
+          {/* Row 1: Headers */}
+          <div className="grid-header">ピッキング</div>
+          <div className="grid-header">箱出し</div>
+          <div className="grid-header">梱包</div>
+
+          {/* Row 2: Body Items (12 items total) */}
+          {/* Group 1: ピッキング */}
+          <div className="grid-label col-span1">時間</div>
+          <div className="grid-input col-span4">~</div>
+          <div className="grid-label col-span1">個数</div>
+          <div className="grid-input col-span2">&nbsp;</div>
+          
+          {/* Group 2: 箱出し */}
+          <div className="grid-label col-span1">時間</div>
+          <div className="grid-input col-span4">~</div>
+          <div className="grid-label col-span1">個数</div>
+          <div className="grid-input col-span2">&nbsp;</div>
+
+          {/* Group 3: 梱包 */}
+          <div className="grid-label col-span1">時間</div>
+          <div className="grid-input col-span4">~</div>
+          <div className="grid-label col-span1">個数</div>
+          <div className="grid-input col-span2">&nbsp;</div>
         </div>
 
         {/* 1. ヘッダーだけのテーブル */}
@@ -97,6 +131,8 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
             </tr>
           </tfoot>
         </table>
+
+        <hr />
 
         {/* 複数個注文が1件以上ある場合のみ、このセクションを描画 */}
         {multiItemOrders.length > 0 && (

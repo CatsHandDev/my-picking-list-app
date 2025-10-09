@@ -224,12 +224,13 @@ button:disabled {
 }
 
 .picking-header {
-  margin-bottom: 10px;
+  margin-bottom: .5rem;
   flex-shrink: 0;
 }
 
 .picking-header h2 {
   font-size: 20px;
+  margin-bottom: .5rem;
 }
 
 .warning-box {
@@ -493,6 +494,10 @@ tfoot .footer-row {
     margin-block: 0;
   }
 
+  .printable-container span {
+    font-size: 16px;
+  }
+
   .printable-container table:nth-of-type(2) {
     /* テーブル間のボーダーが二重にならないように */
     border-collapse: collapse;
@@ -506,6 +511,10 @@ tfoot .footer-row {
   /* 印刷用のテーブルボディ内の偶数行(tr)に背景色を適用 */
   .printable-container table:nth-of-type(2) tbody tr:nth-child(even) {
     background-color: #e0e0e0 !important;
+  }
+
+  .multi-order-list-container {
+    margin-top: 40px;
   }
 
   /* ヘッダーとフッターの背景色が優先されるように確認 */
@@ -576,4 +585,79 @@ tfoot .footer-row {
     font-weight: bold;
     background-color: #e6e6e6;
   }
+}
+
+/* 作業記録Grid全体のコンテナ */
+/* ---------------------------------- */
+/* --- ピッキング・箱出し・梱包エリア --- */
+/* ---------------------------------- */
+.work-log-grid {
+  width: 100%;
+  /* Gridレイアウトを有効化 */
+  display: grid;
+
+  /* 12列のグリッドを作成。各列は利用可能なスペースを均等に分け合う */
+  grid-template-columns: repeat(24, 1fr);
+  border: 1px solid #333;
+  margin: 25px 0;
+}
+
+/* Gridコンテナのすべての子要素（セル）に共通のスタイル */
+.work-log-grid > * {
+  border: 1px solid #666;
+  padding: 2px;
+  text-align: center;
+  font-size: 1.1em;
+  display: flex; /* 中央揃えのため */
+  justify-content: center;
+  align-items: center;
+}
+
+/* ヘッダーセルのスタイル */
+.work-log-grid .grid-header {
+  /* テーブルのcolSpan=4と同じ意味。4つの列を結合する */
+  grid-column: span 8; 
+  background-color: #f2f2f2;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* 「時間：」「個数：」ラベルのセルのスタイル */
+.work-log-grid .grid-label {
+  /* height: fit-content; */
+  padding: .5rem;
+  align-items: center;
+  justify-content: center; /* テキストを右揃えにする */
+  background-color: #fafafa;
+  white-space: nowrap;
+}
+
+/* 手書き入力用のセルのスタイル */
+.work-log-grid .grid-input {
+  /* height: fit-content; */
+  padding: .5rem;
+}
+
+.col-span1 {
+  grid-column: span 1 !important; 
+}
+
+.col-span2 {
+  grid-column: span 2 !important; 
+}
+
+.col-span3 {
+  grid-column: span 3 !important;
+}
+
+.col-span4 {
+  grid-column: span 4 !important;
+}
+
+.col-span5 {
+  grid-column: span 5 !important; 
+}
+
+.col-span6 {
+  grid-column: span 6 !important; 
 }
