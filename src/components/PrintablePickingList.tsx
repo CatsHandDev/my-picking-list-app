@@ -30,9 +30,9 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
             <div>
               <span><strong>配送方法: </strong>{shippingMethod}</span>
               {shippingNotes.length > 0 && (
-                <p className="shipping-notes">
+                <span className="shipping-notes">
                   {' - '}{shippingNotes.join(', ')}{' - '}
-                </p>
+                </span>
               )}
               <br />
               <span><strong>作成日時: </strong>{loadedAt}</span>
