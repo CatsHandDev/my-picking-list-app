@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import { usePickingLogic } from "../hooks/usePickingLogic";
+import { log } from "console";
 
 interface Props {
   data: OrderItem[];
@@ -15,8 +16,22 @@ interface Props {
 }
 
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, shippingNotes, onDataCalculated }) => {
-  const { pickingList, totalSingleUnits } = usePickingLogic(data, sheet);
+  const [isSorted, setIsSorted] = useState<boolean>(true);
 
+// 1. フックからソートされていない「生」のリストを受け取る
+  const { rawPickingList, totalSingleUnits } = usePickingLogic(data, sheet);
+  
+  // 2. isSortedの状態に応じて、表示用のリストをuseMemoで生成する
+  const pickingList = useMemo(() => {
+    // isSortedがfalseの場合は、生のリストをそのまま返す
+    if (!isSorted) {
+      return rawPickingList;
+    }
+    // isSortedがtrueの場合は、配列のコピーを作成してからソートする
+    // これにより、元のrawPickingListが変更されるのを防ぐ
+    return [...rawPickingList].sort((a, b) => a.商品名.localeCompare(b.商品名, 'ja'));
+  }, [rawPickingList, isSorted]); // 生リストか、ソート状態が変わったら再計算
+  
   useEffect(() => {
     onDataCalculated(pickingList, totalSingleUnits);
   }, [pickingList, totalSingleUnits, onDataCalculated]);
@@ -34,16 +49,26 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span>
-            <strong>配送方法:</strong> {shippingMethod}
-            {/* shippingNotesに中身がある場合のみ表示 */}
-            {shippingNotes.length > 0 && (
-              <span className="shipping-notes">
-                {' - '}{shippingNotes.join(', ')}{' - '}
-              </span>
-            )}
-          </span>
-          <span><strong>ファイル読み込み日時:</strong> {loadedAt}</span>
+          <div>
+            <span>
+              <strong>配送方法:</strong> {shippingMethod}
+              {/* shippingNotesに中身がある場合のみ表示 */}
+              {shippingNotes.length > 0 && (
+                <span className="shipping-notes">
+                  {' - '}{shippingNotes.join(', ')}{' - '}
+                </span>
+              )}
+            </span>
+            <br />
+            <span><strong>ファイル読み込み日時:</strong> {loadedAt}</span>
+          </div>
+          <button 
+            onClick={() => setIsSorted(!isSorted)} 
+            // isSortedがtrueの場合に 'active' クラスを追加
+            className={`sort-toggle-button ${isSorted ? 'active' : ''}`}
+          >
+            ソート
+          </button>
         </div>
       </div>
 

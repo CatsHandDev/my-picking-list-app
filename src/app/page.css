@@ -661,3 +661,35 @@ tfoot .footer-row {
 .col-span6 {
   grid-column: span 6 !important; 
 }
+
+/* ソート切り替えボタンの基本スタイル（非アクティブ状態） */
+.sort-toggle-button {
+  background-color: transparent; /* 背景を透明に */
+  border: 1px solid #d0d7de; /* 薄いグレーのボーダー */
+  color: #57606a; /* 少し薄めのテキスト色 */
+  padding: 5px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.sort-toggle-button:hover {
+  border-color: #8c959f;
+  background-color: #f6f8fa;
+}
+
+/* ソートが有効な時のアクティブ状態のスタイル */
+.sort-toggle-button.active {
+  background-color: #ddf4ff; /* 明るい青系の背景色 */
+  border-color: #58a6ff; /* 少し濃い青のボーダー */
+  color: #0969da; /* 濃い青のテキスト色 */
+  font-weight: 600; /* 少し太字に */
+}
+
+/* アクティブ状態でのホバー */
+.sort-toggle-button.active:hover {
+  background-color: #cdeeff;
+  border-color: #2f81f7;
+}

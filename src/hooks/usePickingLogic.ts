@@ -17,7 +17,7 @@ const SKU_LOT_UNIT_MAP: { [key: string]: number } = {
 export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
   
   // PickingListにあったuseMemoを、そのままこのフックの本体として利用
-  const { pickingList, totalSingleUnits } = useMemo(() => {
+  const { rawPickingList, totalSingleUnits } = useMemo(() => {
     const map = new Map<string, PickingItemRow>();
 
     data.forEach((item) => {
@@ -85,13 +85,12 @@ export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
     });
 
     const list = Array.from(map.values());
-    list.sort((a, b) => a.商品名.localeCompare(b.商品名, 'ja')); // 商品名ソートもロジックの一部としてここに残す
     
     const totalSingles = list.reduce((sum, item) => sum + item.単品換算数, 0);
 
-    return { pickingList: list, totalSingleUnits: totalSingles };
+    return { rawPickingList: list, totalSingleUnits: totalSingles };
   }, [data, sheet]);
 
   // 計算結果を返す
-  return { pickingList, totalSingleUnits };
+  return { rawPickingList, totalSingleUnits };
 }
