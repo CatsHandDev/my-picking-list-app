@@ -16,30 +16,40 @@ const SKU_LOT_UNIT_MAP: { [key: string]: number } = {
  */
 export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
   
-  // PickingListにあったuseMemoを、そのままこのフックの本体として利用
   const { rawPickingList, totalSingleUnits } = useMemo(() => {
+    console.log("=============== usePickingLogic 再計算開始 ===============");
     const map = new Map<string, PickingItemRow>();
 
     data.forEach((item) => {
-      const itemCode = item["商品コード"];
-      const itemSku = item["商品SKU"];
+      const productNameForItem = item['商品名'];
       const count = parseInt(item["個数"], 10) || 0;
-      if (count === 0) return;
+
+      // === CONSOLE GROUP START: 各商品の処理をグループ化して見やすくする ===
+      console.group(`--- 処理開始: "${productNameForItem}" (注文数: ${count}) ---`);
+
+      if (count === 0) {
+        console.log("注文数が0のためスキップします。");
+        console.groupEnd();
+        return;
+      }
 
       let jan = "";
       let parentJan: string | undefined = undefined;
-      let lotUnit = 1;
-      let productName = item['商品名'];
+      let lotUnit = 1; // ① 初期ロット入数
+      let productName = productNameForItem;
       let parentQuantity: number | undefined = undefined;
 
-      // --- SKUによるロット入数の上書きロジック ---
+
+      // --- STEP 1: SKUによるロット入数の上書きを先にチェック ---
       let lotUnitOverride: number | undefined = undefined;
       const skuFromCsv = item['SKU管理番号'];
       if (skuFromCsv && SKU_LOT_UNIT_MAP[skuFromCsv]) {
         lotUnitOverride = SKU_LOT_UNIT_MAP[skuFromCsv];
       }
       
-      // --- スプレッドシートから正しい行を特定するロジック ---
+      // --- STEP 2: スプレッドシートから正しい行を特定 ---
+      const itemCode = item["商品コード"];
+      const itemSku = item["商品SKU"];
       let targetRow: string[] | undefined = undefined;
       
       const qRow = 
@@ -48,6 +58,7 @@ export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
 
       if (qRow) {
         const pRows = sheet.filter(r => r[15]?.toLowerCase() === itemCode?.toLowerCase());
+
         if (pRows.length === 0) {
           targetRow = qRow;
         } else if (pRows.length === 1) {
@@ -59,24 +70,28 @@ export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
         }
       }
 
-      // --- 最終的なロット入数と商品情報を決定 ---
+      // --- STEP 3: 最終的な商品情報とロット入数を決定 ---
       if (targetRow) {
-        const lotUnitFromSheet = parseInt(targetRow[6] || "1", 10);
         jan = targetRow[5] || "";
         productName = targetRow[17] || item["商品名"];
-        const parentAsin = targetRow[7]; // H列 (親ASIN)
-        // H列に親ASINが存在する場合のみ、I列(親JAN)を取得する
+        
+        const parentAsin = targetRow[7]; // H列
+
         if (parentAsin && parentAsin.trim() !== '') {
-          parentJan = targetRow[8] || undefined; // I列 (親JAN)
-          // J列(index 9)から親ロット入数を取得。見つからなければ1とする
+          parentJan = targetRow[8] || undefined;
           const parentLotUnit = parseInt(targetRow[9] || "1", 10);
           parentQuantity = parentLotUnit * count;
+          const childLotUnitFromSheet = parseInt(targetRow[6] || "1", 10);
+          lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : childLotUnitFromSheet;
+
+        } else {
+          const lotUnitFromSheet = parseInt(targetRow[6] || "1", 10);
+          lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : lotUnitFromSheet;
         }
-        lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : lotUnitFromSheet;
+
       } else {
         lotUnit = lotUnitOverride !== undefined ? lotUnitOverride : 1;
       }
-      
       const singleUnits = lotUnit * count;
       const mapKey = jan || productName;
 
@@ -86,19 +101,19 @@ export function usePickingLogic(data: OrderItem[], sheet: string[][]) {
         ex.単品換算数 += singleUnits;
         ex.親数量 = (ex.親数量 || 0) + (parentQuantity || 0);
       } else {
-        map.set(mapKey, {
+        const newEntry = {
           商品名: productName,
           JANコード: jan,
           親JANコード: parentJan,
           個数: count,
           単品換算数: singleUnits,
           親数量: parentQuantity,
-        });
+        };
+        map.set(mapKey, newEntry);
       }
     });
 
     const list = Array.from(map.values());
-    
     const totalSingles = list.reduce((sum, item) => sum + item.単品換算数, 0);
 
     return { rawPickingList: list, totalSingleUnits: totalSingles };
