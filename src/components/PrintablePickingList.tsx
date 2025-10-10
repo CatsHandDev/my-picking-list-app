@@ -104,12 +104,13 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                 </td>
                 <td className="count" style={{ width: '5%' }}>
                   {item.単品換算数}
-                  {item.親数量 && item.親数量 > 0 && (
+                  {(item.親数量 && item.親数量 > 0) ? (
                     <>
                       <br />
                       <span className="parent-quantity">({item.親数量})</span>
                     </>
-                  )}
+                  ) : null
+                  }
                 </td>
                 <td className="case" style={{ width: '5%' }}></td>
                 <td className="box" style={{ width: '5%' }}></td>
