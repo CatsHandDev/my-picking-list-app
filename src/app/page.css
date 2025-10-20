@@ -434,7 +434,7 @@ tfoot .footer-row {
 @media print {
   @page {
     size: A4;
-    margin-block: 40px;
+    margin-block: 60px 40px;
 
     @top-center {
       content: "";
@@ -574,7 +574,8 @@ tfoot .footer-row {
   td.itemName {
     max-width: 40%;
     min-width: 40%;
-    padding: 12px;
+    padding: 8px 12px;
+    font-size: 14px;
     line-height: 1.5;
     white-space: nowrap;
     overflow: hidden;
