@@ -228,6 +228,7 @@ function Home() {
                     loadedAt={loadedAt}
                     shippingNotes={shippingNotes}
                     multiItemOrders={multiItemOrders}
+                    dataLength={data.length}
                   />
                 </div>
               </>

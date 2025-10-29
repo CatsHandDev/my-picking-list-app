@@ -16,11 +16,12 @@ interface PrintableProps {
   totalSingleUnits: number;
   multiItemOrders: OrderItem[];
   shippingNotes: string[];
+  dataLength: number;
 }
 
 // forwardRef を使って親から ref を受け取れるようにする
 const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
-  ({ pickingList, shippingMethod, loadedAt, totalSingleUnits, multiItemOrders, shippingNotes }, ref) => {
+  ({ pickingList, shippingMethod, loadedAt, totalSingleUnits, multiItemOrders, shippingNotes, dataLength }, ref) => {
     return (
       // ref はこの一番外側の div に設定する
       <div ref={ref} className="printable-container">
@@ -56,19 +57,19 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
           <div className="grid-label col-span1">時間</div>
           <div className="grid-input col-span4">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2">&nbsp;</div>
+          <div className="grid-input col-span2">{totalSingleUnits}</div>
           
           {/* Group 2: 箱出し */}
           <div className="grid-label col-span1">時間</div>
           <div className="grid-input col-span4">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2">&nbsp;</div>
+          <div className="grid-input col-span2">{dataLength}</div>
 
           {/* Group 3: 梱包 */}
           <div className="grid-label col-span1">時間</div>
           <div className="grid-input col-span4">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2">&nbsp;</div>
+          <div className="grid-input col-span2">{dataLength}</div>
         </div>
 
         {/* 1. ヘッダーだけのテーブル */}
