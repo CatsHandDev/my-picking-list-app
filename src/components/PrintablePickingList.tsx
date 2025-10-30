@@ -55,21 +55,21 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
           {/* Row 2: Body Items (12 items total) */}
           {/* Group 1: ピッキング */}
           <div className="grid-label col-span1">時間</div>
-          <div className="grid-input col-span4">~</div>
+          <div className="grid-input col-span4 fs16">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2">{totalSingleUnits}</div>
+          <div className="grid-input col-span2 fs16">{totalSingleUnits}</div>
           
           {/* Group 2: 箱出し */}
           <div className="grid-label col-span1">時間</div>
-          <div className="grid-input col-span4">~</div>
+          <div className="grid-input col-span4 fs16">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2">{dataLength}</div>
+          <div className="grid-input col-span2 fs16">{dataLength}</div>
 
           {/* Group 3: 梱包 */}
           <div className="grid-label col-span1">時間</div>
-          <div className="grid-input col-span4">~</div>
+          <div className="grid-input col-span4 fs16">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2">{dataLength}</div>
+          <div className="grid-input col-span2 fs16">{dataLength}</div>
         </div>
 
         {/* 1. ヘッダーだけのテーブル */}

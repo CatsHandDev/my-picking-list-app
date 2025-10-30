@@ -586,6 +586,11 @@ tfoot .footer-row {
     font-weight: bold;
     background-color: #e6e6e6;
   }
+  
+  .fs16 {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
 }
 
 /* 作業記録Grid全体のコンテナ */
@@ -636,7 +641,9 @@ tfoot .footer-row {
 /* 手書き入力用のセルのスタイル */
 .work-log-grid .grid-input {
   /* height: fit-content; */
-  padding: .5rem;
+  padding: .25rem;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .col-span1 {
