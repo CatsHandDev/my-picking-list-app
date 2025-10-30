@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { OrderItem } from '../types';
 
 interface Props {
@@ -24,12 +24,26 @@ const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
 
   const excludedItemsCount = excludedItems.length;
 
+  // GoQ管理番号を基準にユニークな注文件数を計算する
+  const uniqueOrderCount = useMemo(() => {
+    // 1. data配列からGoQ管理番号だけを抜き出す
+    // 2. Setに入れて重複を排除する
+    // 3. Setのsizeプロパティでユニークな件数を取得する
+    const goQNumbers = new Set(
+      data
+        .map(item => item['GoQ管理番号'])
+        // GoQ管理番号が空やnullのものはカウントから除外する
+        .filter(goQ => goQ && goQ.trim() !== '') 
+    );
+    return goQNumbers.size;
+  }, [data]);
+
   return (
     <div className="list-wrapper">
       {/* 1. 固定したいヘッダー部分 (スクロールするコンテナの外に出す) */}
       <div className="list-header">
         <h2>{title}</h2>
-        <span>総注文件数: {data.length}件</span>
+        <span>総注文件数: {uniqueOrderCount}件 (全{data.length}行)</span>
         {excludedItemsCount > 0 && (
           <span className="warning-text">
             ※うち{excludedItemsCount}件はピッキング対象外(商品SKUが存在しない)
