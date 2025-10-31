@@ -557,7 +557,7 @@ tfoot .footer-row {
   }
 
   .check, .count, .case, .box, .other {
-    width: 5%;
+    width: 4%;
     min-width: fit-content;
     text-align: center;
   }
