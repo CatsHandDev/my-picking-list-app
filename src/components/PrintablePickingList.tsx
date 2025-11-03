@@ -16,12 +16,21 @@ interface PrintableProps {
   totalSingleUnits: number;
   multiItemOrders: OrderItem[];
   shippingNotes: string[];
-  dataLength: number;
+  uniqueOrderCount: number;
 }
 
 // forwardRef を使って親から ref を受け取れるようにする
 const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
-  ({ pickingList, shippingMethod, loadedAt, totalSingleUnits, multiItemOrders, shippingNotes, dataLength }, ref) => {
+  ({ 
+    pickingList, 
+    shippingMethod, 
+    loadedAt, 
+    totalSingleUnits, 
+    multiItemOrders,
+    shippingNotes,
+    uniqueOrderCount // propを受け取る
+  }, ref) => {
+    
     return (
       // ref はこの一番外側の div に設定する
       <div ref={ref} className="printable-container">
@@ -63,13 +72,13 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
           <div className="grid-label col-span1">時間</div>
           <div className="grid-input col-span4 fs16">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2 fs16">{dataLength}</div>
+          <div className="grid-input col-span2 fs16">{uniqueOrderCount}</div>
 
           {/* Group 3: 梱包 */}
           <div className="grid-label col-span1">時間</div>
           <div className="grid-input col-span4 fs16">~</div>
           <div className="grid-label col-span1">個数</div>
-          <div className="grid-input col-span2 fs16">{dataLength}</div>
+          <div className="grid-input col-span2 fs16">{uniqueOrderCount}</div>
         </div>
 
         {/* 1. ヘッダーだけのテーブル */}

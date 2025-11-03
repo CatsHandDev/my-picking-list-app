@@ -144,6 +144,16 @@ function Home() {
     setPickingData({ list, total });
   }, []);
 
+  // GoQ管理番号を基準にユニークな注文件数を計算
+  const uniqueOrderCount = useMemo(() => {
+    const goQNumbers = new Set(
+      data
+      .map(item => item['GoQ管理番号'])
+      .filter(goQ => goQ && goQ.trim() !== '')
+      );
+    return goQNumbers.size;
+  }, [data]);
+
   if (loading) {
     return (
       <div className="cube-container">
@@ -228,7 +238,7 @@ function Home() {
                     loadedAt={loadedAt}
                     shippingNotes={shippingNotes}
                     multiItemOrders={multiItemOrders}
-                    dataLength={data.length}
+                    uniqueOrderCount={uniqueOrderCount}
                   />
                 </div>
               </>
