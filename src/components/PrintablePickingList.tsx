@@ -109,7 +109,7 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                   {item.親JANコード && (
                     <>
                       <br />
-                      <span className="parent-jan">(親: {formatJanDisplay(item.親JANコード)})</span>
+                      <span className="parent-jan">({formatJanDisplay(item.親JANコード)})</span>
                     </>
                   )}
                 </td>
