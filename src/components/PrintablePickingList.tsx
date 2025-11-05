@@ -85,13 +85,13 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
         <table className="print-table">
           <thead>
             <tr>
-              <th className="check" style={{ width: '2%' }}></th>
-              <th className="itemName" style={{ flex: 1 }}>商品名</th>
-              <th className="jan" style={{ width: '6%' }}>JAN</th>
-              <th className="count" style={{ width: '4%' }}>数量</th>
-              <th className="case" style={{ width: '5%' }}>ケース</th>
-              <th className="box" style={{ width: '4%' }}>箱</th>
-              <th className="other" style={{ width: '4%' }}>その他</th>
+              <th className="check"></th>
+              <th className="itemName">商品名</th>
+              <th className="jan">JAN</th>
+              <th className="count">数量</th>
+              <th className="case">ケース</th>
+              <th className="box">箱</th>
+              <th className="other">その他</th>
             </tr>
           </thead>
         </table>
@@ -101,9 +101,9 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
           <tbody>
             {pickingList.map((item, index) => (
               <tr key={`${item.JANコード}-${item.商品名}-${index}`}>
-                <td className="check" style={{ width: '2%' }}></td>
-                <td className="itemName" style={{ flex: 1 }}>{item.商品名}</td>
-                <td className="jan" style={{ width: '6%' }}>
+                <td className="check"></td>
+                <td className="itemName">{item.商品名}</td>
+                <td className="jan">
                   {item.JANコード ? item.JANコード.slice(-4) : ''}
                   {item.親JANコード && (
                     <>
@@ -112,7 +112,7 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                     </>
                   )}
                 </td>
-                <td className="count" style={{ width: '4%' }}>
+                <td className="count">
                   {item.単品換算数}
                   {(item.親数量 && item.親数量 > 0) ? (
                     <>
@@ -122,9 +122,9 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                   ) : null
                   }
                 </td>
-                <td className="case" style={{ width: '5%' }}></td>
-                <td className="box" style={{ width: '4%' }}></td>
-                <td className="other" style={{ width: '4%' }}></td>
+                <td className="case"></td>
+                <td className="box"></td>
+                <td className="other"></td>
               </tr>
             ))}
           </tbody>
@@ -133,13 +133,13 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
         <table className="print-table">
           <tbody>
             <tr>
-              <td className="check" style={{ width: '3%' }}>&nbsp;</td>
-              <td className="itemName" style={{ flex: 1 }}>&nbsp;</td>
-              <td className="jan" style={{ width: '7%' }}>&nbsp;</td>
-              <td className="count" style={{ width: '5%' }}>&nbsp;</td>
-              <td className="case" style={{ width: '5%' }}>&nbsp;</td>
-              <td className="box" style={{ width: '5%' }}>&nbsp;</td>
-              <td className="other" style={{ width: '5%' }}>&nbsp;</td>
+              <td className="check">&nbsp;</td>
+              <td className="itemName">&nbsp;</td>
+              <td className="jan">&nbsp;</td>
+              <td className="count">&nbsp;</td>
+              <td className="case">&nbsp;</td>
+              <td className="box">&nbsp;</td>
+              <td className="other">&nbsp;</td>
             </tr>
           </tbody>
         </table>
@@ -148,13 +148,13 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
         <table className="print-table footer-table">
           <tfoot>
             <tr className="footer-row">
-              <td className="check" style={{ width: '3%' }}>合計</td>
-              <td className="itemName" style={{ flex: 1 }}></td>
-              <td className="jan" style={{ width: '7%' }}></td>
-              <td className="count" style={{ width: '5%', textAlign: "center" }}>{totalSingleUnits}</td>
-              <td className="case" style={{ width: '5%' }}></td>
-              <td className="box" style={{ width: '5%' }}></td>
-              <td className="other" style={{ width: '5%' }}></td>
+              <td className="check">合計</td>
+              <td className="itemName"></td>
+              <td className="jan"></td>
+              <td className="count">{totalSingleUnits}</td>
+              <td className="case"></td>
+              <td className="box"></td>
+              <td className="other"></td>
             </tr>
           </tfoot>
         </table>
@@ -168,23 +168,23 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
             <table className="print-table">
               <thead>
                 <tr>
-                  <th style={{ width: '10%' }}>GoQ管理番号</th>
-                  <th style={{ width: '15%' }}>受注番号</th>
+                  <th style={{ width: '7%' }}>GoQ管理番号</th>
+                  {/* <th style={{ width: '15%' }}>受注番号</th> */}
                   <th style={{ width: '15%' }}>送付先氏名</th>
-                  <th style={{ width: '40%' }}>商品名</th>
+                  <th style={{ flex: 1 }}>商品名</th>
                   <th style={{ width: '5%' }}>個数</th>
-                  <th style={{ width: '15%' }}>JANコード</th>
+                  <th style={{ width: '10%' }}>JANコード</th>
                 </tr>
               </thead>
               <tbody>
                 {multiItemOrders.map((item, index) => (
                   <tr key={`${item.受注番号}-${index}`}>
-                    <td>{item['GoQ管理番号']}</td>
-                    <td>{item['受注番号']}</td>
-                    <td>{item['送付先氏名']}</td>
-                    <td>{item['商品名']}</td>
-                    <td style={{ textAlign: 'center' }}>{item['個数']}</td>
-                    <td>{item['JANコード']}</td>
+                    <td style={{ fontSize: 10 }}>{item['GoQ管理番号']}</td>
+                    {/* <td>{item['受注番号']}</td> */}
+                    <td style={{ fontSize: 10 }}>{item['送付先氏名']}</td>
+                    <td style={{ fontSize: 10, flex: 1 }}>{item['商品名']}</td>
+                    <td style={{ fontSize: 10, textAlign: 'center' }}>{item['個数']}</td>
+                    <td style={{ fontSize: 10, textAlign: 'center' }}>{item['JANコード'].slice(-4)}</td>
                   </tr>
                 ))}
               </tbody>

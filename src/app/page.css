@@ -562,13 +562,20 @@ tfoot .footer-row {
     text-align: center;
   }
 
+  .itemName {
+    flex: 1;
+  }
+
   .check {
-    width: 3%;
+    width: 2%;
    }
 
   .jan {
+    width: 6%;
+  }
+
+  .case {
     width: 5%;
-    text-align: center;
   }
 
   td.itemName {
