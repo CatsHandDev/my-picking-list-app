@@ -7,7 +7,7 @@
  * 値：表示したい文字列
  */
 const JAN_EXCEPTION_MAP: { [key: string]: string } = {
-  '000000000A003': 'JANなし',
+  '000000000A003': 'なし',
   // 例: 'ANOTHER_SPECIAL_CODE': '要確認',
 };
 
