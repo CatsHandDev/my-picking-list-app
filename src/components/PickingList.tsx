@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import { usePickingLogic } from "../hooks/usePickingLogic";
-import { log } from "console";
+import { formatJanDisplay } from "../utils/janDisplayHelper";
 
 interface Props {
   data: OrderItem[];
@@ -91,11 +91,13 @@ const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, e
                 <td></td>
                 <td className="itemName">{item.商品名}</td>
                 <td className="jan">
-                  {item.JANコード ? item.JANコード.slice(-4) : ''}
+                  {/* 子JANの表示 */}
+                  {formatJanDisplay(item.JANコード)}
+                  {/* 親JANが存在する場合、改行して表示 */}
                   {item.親JANコード && (
                     <>
                       <br />
-                      <span className="parent-jan">(親: {item.親JANコード.slice(-4)})</span>
+                      <span className="parent-jan">(親: {formatJanDisplay(item.親JANコード)})</span>
                     </>
                   )}
                 </td>

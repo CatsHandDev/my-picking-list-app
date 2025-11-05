@@ -1,6 +1,7 @@
 import React from 'react';
 import type { OrderItem, PickingItemRow } from "../types";
 import { SKU_LOT_UNIT_MAP } from "../types";
+import { formatJanDisplay } from '@/utils/janDisplayHelper';
 
 // PickingListから型定義などを再利用
 interface RowData {
@@ -104,11 +105,11 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                 <td className="check"></td>
                 <td className="itemName">{item.商品名}</td>
                 <td className="jan">
-                  {item.JANコード ? item.JANコード.slice(-4) : ''}
+                  {formatJanDisplay(item.JANコード)}
                   {item.親JANコード && (
                     <>
                       <br />
-                      <span>({item.親JANコード.slice(-4)})</span>
+                      <span className="parent-jan">(親: {formatJanDisplay(item.親JANコード)})</span>
                     </>
                   )}
                 </td>
