@@ -557,7 +557,7 @@ tfoot .footer-row {
   }
 
   .check, .count, .case, .box, .other {
-    width: 4%;
+    width: 3%;
     min-width: fit-content;
     text-align: center;
   }
@@ -571,22 +571,22 @@ tfoot .footer-row {
    }
 
   .jan {
-    width: 6%;
+    width: 5%;
   }
 
   .case {
-    width: 5%;
+    width: 4%;
   }
 
   td.itemName {
     max-width: 40%;
     min-width: 40%;
     padding: 8px 12px;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.5;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: wrap;
+    /* overflow: hidden;
+    text-overflow: ellipsis; */
   }
 
   tfoot .footer-row {
