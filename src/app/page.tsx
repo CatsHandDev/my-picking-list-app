@@ -75,14 +75,8 @@ function Home() {
         } as OrderItem;
       })
       .filter(item => {
-      const itemSku = item['商品SKU'];
-
-      // 【選べる】シリーズかどうかを、インポートしたMAPで判定
-      const isSelectableSeries = itemSku ? SELECTABLE_SERIES_SKU_MAP[itemSku] === true : false;
-
-      // フィルタリング条件
-      return isSelectableSeries || item['計算後総個数']! >= 2;
-    });
+        return item['計算後総個数']! >= 2;
+      });
 
     return filteredAndMappedData;
   }, [data]);
