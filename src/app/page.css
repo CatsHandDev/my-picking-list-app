@@ -280,7 +280,7 @@ tbody tr:nth-child(even) {
 }
 
 .jan, .count {
-  font-size: 16px;
+  font-size: 12px;
   font-weight: bold;
 }
 
@@ -575,7 +575,7 @@ tfoot .footer-row {
   }
 
   .case .count {
-    width: 4%;
+    width: 5%;
   }
 
   td.itemName {
