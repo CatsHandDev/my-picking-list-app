@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { OrderItem } from '../types';
 import { calculateSetCount } from '@/utils/itemCalculations';
+import { SELECTABLE_SERIES_SKU_MAP } from '@/utils/exceptionProducts';
 
 interface Props {
   data: OrderItem[];
@@ -64,8 +65,14 @@ const OrderList: React.FC<Props> = ({ data, sheet, title, currentView }) => {
               <th>受注番号</th>
               <th style={{ width: "4%" }}>送付先氏名</th>
               <th style={{ width: "15%" }}>商品名</th>
-              <th style={{ width: "2%" }}>注文数</th>
-              <th style={{ width: "4%" }}>単品総数</th>
+              {currentView === 'order' ? (
+                <>
+                  <th style={{ width: "2%" }}>注文数</th>
+                  <th style={{ width: "4%" }}>単品総数</th>
+                </>
+              ) : (
+                <th style={{ width: "2%" }}>注文数</th>
+              )}
               <th style={{ width: "4%" }}>JANコード</th>
               <th>商品コード</th>
             </tr>
@@ -94,6 +101,8 @@ const OrderList: React.FC<Props> = ({ data, sheet, title, currentView }) => {
                 totalQuantity = item['計算後総個数']!; 
               }
 
+              const isSelectableSeries = itemSku ? SELECTABLE_SERIES_SKU_MAP[itemSku] === true : false;
+
               return (
                 <tr key={`${item.受注番号}-${index}`} className={isExcluded ? 'excluded-row' : ''}>
                   <td>{item['注文日時']}</td>
@@ -102,9 +111,17 @@ const OrderList: React.FC<Props> = ({ data, sheet, title, currentView }) => {
                   <td>{item['受注番号']}</td>
                   <td>{item['送付先氏名']}</td>
                   <td className="itemName">{item['商品名']}</td>
-                  <td style={{ textAlign: "center" }}>{item['個数']}</td>
-                  <td style={{ textAlign: "center", fontWeight: "bold" }}>{totalQuantity}</td>
-                  <td>{item['JANコード']}</td>
+                  {currentView === 'order' ? (
+                    <>
+                      <td style={{ textAlign: "center" }}>{item['個数']}</td>
+                      <td style={{ textAlign: "center", fontWeight: "bold" }}>{totalQuantity}</td>
+                    </>
+                  ) : (
+                    <td style={{ textAlign: "center", fontWeight: "bold" }}>
+                      {isSelectableSeries ? totalQuantity : item['個数']}
+                    </td>
+                  )}
+                  <td style={{ textAlign: "center", fontWeight: "bold" }}>{item['JANコード'].slice(-4)}</td>
                   <td>{item['商品コード']}</td>
                 </tr>
               );

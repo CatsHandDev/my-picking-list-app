@@ -2,6 +2,7 @@ import React from 'react';
 import type { OrderItem, PickingItemRow } from "../types";
 import { formatJanDisplay } from '@/utils/janDisplayHelper';
 import { calculateSetCount } from '../utils/itemCalculations';
+import { SELECTABLE_SERIES_SKU_MAP } from '@/utils/exceptionProducts';
 
 interface PrintableProps {
   pickingList: PickingItemRow[];
@@ -169,15 +170,15 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                   <th style={{ width: '15%' }}>送付先氏名</th>
                   <th style={{ flex: 1 }}>商品名</th>
                   <th style={{ width: '5%' }}>個数</th>
-                  <th style={{ width: '5%' }}>単品総数</th>
                   <th style={{ width: '10%' }}>JANコード</th>
                 </tr>
               </thead>
               <tbody>
                 {multiItemOrders.map((item, index) => {
-                  const setCount = calculateSetCount(item, sheet);
-                  const csvQuantity = parseInt(item['個数'], 10) || 0;
-                  const totalQuantity = setCount * csvQuantity;
+                  const itemSku = item['商品SKU'];
+                  const isSelectableSeries = itemSku ? SELECTABLE_SERIES_SKU_MAP[itemSku] === true : false;
+                  const displayQuantity = isSelectableSeries ? item['計算後総個数']! : item['個数'];
+
 
                   return (
                     <tr key={`${item.受注番号}-${index}`}>
@@ -185,9 +186,8 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                       {/* <td>{item['受注番号']}</td> */}
                       <td>{item['注文者氏名']}</td>
                       <td>{item['商品名']}</td>
-                      <td style={{ fontSize: 16, textAlign: 'center' }}>{item['個数']}</td>
-                      <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{totalQuantity}</td>
-                      <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{item['JANコード'].slice(-4)}</td>
+                      <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{displayQuantity}</td>
+                      <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{formatJanDisplay(item['JANコード'].slice(-4))}</td>
                     </tr>
                   );
                 })}

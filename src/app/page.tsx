@@ -11,7 +11,7 @@ import { useSheetData } from '../hooks/useSheetData';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useSheetNames } from '../hooks/useSheetNames';
 import './page.css';
-import { calculateSetCount } from '@/utils/itemCalculations';
+import { calculateSetCount, findJanCode } from '@/utils/itemCalculations';
 import { SELECTABLE_SERIES_SKU_MAP } from '@/utils/exceptionProducts';
 
 function Home() {
@@ -69,13 +69,27 @@ function Home() {
       .map((item) => {
         // ユーティリティ関数を使って、常に正確な単品総数を計算する
         const calculatedTotal = calculateSetCount(item, sheetData) * (parseInt(item['個数'], 10) || 0);
+
+        const janFromSheet = findJanCode(item, sheetData);
+
         return {
           ...item,
+          'JANコード': janFromSheet || item['JANコード'],
           '計算後総個数': calculatedTotal,
         } as OrderItem;
       })
       .filter(item => {
-        return item['計算後総個数']! >= 2;
+        const csvQuantity = parseInt(item['個数'], 10) || 0;
+        const totalQuantity = item['計算後総個数']!;
+        const itemSku = item['商品SKU']; // 商品SKUを取得
+
+        const isSelectableSeries = itemSku ? SELECTABLE_SERIES_SKU_MAP[itemSku] === true : false;
+
+        if (isSelectableSeries) {
+          return totalQuantity >= 2;
+        } else {
+          return csvQuantity >= 2;
+        }
       });
 
     return filteredAndMappedData;
