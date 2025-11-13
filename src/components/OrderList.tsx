@@ -1,13 +1,15 @@
 import React, { useMemo } from 'react';
 import type { OrderItem } from '../types';
+import { calculateSetCount } from '@/utils/itemCalculations';
 
 interface Props {
   data: OrderItem[];
   sheet: string[][];
   title: string;
+  currentView: 'order' | 'multi'; 
 }
 
-const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
+const OrderList: React.FC<Props> = ({ data, sheet, title, currentView }) => {
   // 除外対象 = 商品コードと商品SKUの両方がシートのQ列に存在しないアイテム
   const excludedItems = data.filter(item => {
     const itemCode = item['商品コード'];
@@ -38,6 +40,8 @@ const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
     return goQNumbers.size;
   }, [data]);
 
+  const showCalculatedTotalColumn = currentView === 'order';
+
   return (
     <div className="list-wrapper">
       {/* 1. 固定したいヘッダー部分 (スクロールするコンテナの外に出す) */}
@@ -62,7 +66,8 @@ const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
               <th>受注番号</th>
               <th style={{ width: "4%" }}>送付先氏名</th>
               <th style={{ width: "15%" }}>商品名</th>
-              <th style={{ width: "2%" }}>個数</th>
+              <th style={{ width: "2%" }}>注文数</th>
+              <th style={{ width: "4%" }}>単品総数</th>
               <th style={{ width: "4%" }}>JANコード</th>
               <th>商品コード</th>
             </tr>
@@ -78,6 +83,19 @@ const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
 
               const isExcluded = !isFound;
 
+              let totalQuantity: number;
+
+              if (currentView === 'order') {
+                // 「注文リスト」タブの場合：従来通りシート情報から計算する
+                const setCount = calculateSetCount(item, sheet);
+                const csvQuantity = parseInt(item['個数'], 10) || 0;
+                totalQuantity = setCount * csvQuantity;
+              } else {
+                // 「複数個注文」タブの場合：親コンポーネントで計算済みの値を使う
+                // '!'は、このパスでは`計算後総個数`が必ず存在することをTypeScriptに伝える
+                totalQuantity = item['計算後総個数']!; 
+              }
+
               return (
                 <tr key={`${item.受注番号}-${index}`} className={isExcluded ? 'excluded-row' : ''}>
                   <td>{item['注文日時']}</td>
@@ -87,6 +105,7 @@ const OrderList: React.FC<Props> = ({ data, sheet, title }) => {
                   <td>{item['送付先氏名']}</td>
                   <td className="itemName">{item['商品名']}</td>
                   <td style={{ textAlign: "center" }}>{item['個数']}</td>
+                  <td style={{ textAlign: "center", fontWeight: "bold" }}>{totalQuantity}</td>
                   <td>{item['JANコード']}</td>
                   <td>{item['商品コード']}</td>
                 </tr>

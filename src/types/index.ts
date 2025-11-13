@@ -18,6 +18,7 @@ export interface OrderItem {
   'SKU管理番号': string;
   '商品URL': string;
   '商品SKU': string;
+  '計算後総個数'?: number;
 }
 
 export interface PickingItem {

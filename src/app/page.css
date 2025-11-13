@@ -571,10 +571,10 @@ tfoot .footer-row {
    }
 
   .jan {
-    width: 5%;
+    width: 7%;
   }
 
-  .case {
+  .case .count {
     width: 4%;
   }
 

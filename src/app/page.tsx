@@ -62,34 +62,37 @@ function Home() {
   }, [data, validDataForPicking]);
 
   // 個数が2個以上の注文データだけをフィルタリング
-  const multiItemOrders = useMemo(() => {
+  const multiItemOrders: OrderItem[] = useMemo(() => {
     // データを走査して、条件に合うものを新しい配列に格納する
     const filteredAndMappedData = data
-      .map(item => {
+      .map((item) => {
         const sku = item['SKU管理番号'];
-        
+        const csvQuantity = parseInt(item['個数'], 10) || 0;
+        let calculatedTotal: number;
+
         // SKUが特別リストに含まれているかチェック
         if (sku && SKU_LOT_UNIT_MAP[sku]) {
-          // もし含まれていたら、新しいオブジェクトを作成し、'個数'プロパティを上書きする
-          // これにより元のdata配列を汚染しない（イミュータビリティの維持）
-          return {
-            ...item,
-            '個数': SKU_LOT_UNIT_MAP[sku].toString(), // 数値を文字列に変換して型を合わせる
-          };
+          calculatedTotal = SKU_LOT_UNIT_MAP[sku];
+        } else {
+          // そうでなければ、CSVの個数をそのまま使う
+          // (calculateSetCountはシート情報が必要なので、ここでは単純なロジックに)
+          calculatedTotal = csvQuantity;
         }
         
-        // SKUが特別リストにない場合は、元のアイテムをそのまま返す
-        return item;
+        // 新しいプロパティとして計算結果を追加した新しいオブジェクトを返す
+        return {
+          ...item,
+          '計算後総個数': calculatedTotal,
+        } as OrderItem;
       })
       .filter(item => {
-        // 変換後のデータを使って、個数が2個以上かどうかの最終チェック
-        const quantity = parseInt(item['個数'], 10) || 0;
-        return quantity >= 2;
+        // フィルタリングは、追加した新しいプロパティで行う
+        return item['計算後総個数']! >= 2;
       });
 
     return filteredAndMappedData;
   }, [data]);
-
+  
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -110,7 +113,8 @@ function Home() {
         const processedData = results.data.map(row => {
           const newRow: Partial<OrderItem> = {};
           validHeaders.forEach(header => {
-            newRow[header as keyof OrderItem] = row[header as keyof OrderItem];
+            const anyRow = row as any; 
+            newRow[header as keyof OrderItem] = anyRow[header];
           });
           return newRow as OrderItem;
         });
@@ -211,11 +215,12 @@ function Home() {
 
           <div className="content">
             {view === 'order' ? (
-              <OrderList data={data} sheet={sheetData} title="注文リスト" />
+              // `currentView` propを追加
+              <OrderList data={data} sheet={sheetData} title="注文リスト" currentView={view} />
             ) : view === 'multi' ? (
-              // 新しいタブ用の表示。OrderListを再利用し、フィルタリングしたデータを渡す
-              <OrderList data={multiItemOrders} sheet={sheetData} title="複数個注文リスト" />
-            ) : (
+              // こちらにも `currentView` propを追加
+              <OrderList data={multiItemOrders} sheet={sheetData} title="複数個注文リスト" currentView={view} />
+            ) : ( 
               <>
                 {/* 1. 画面表示用のコンポーネント */}
                 <PickingList

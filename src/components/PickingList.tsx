@@ -3,6 +3,7 @@ import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import { usePickingLogic } from "../hooks/usePickingLogic";
 import { formatJanDisplay } from "../utils/janDisplayHelper";
+import { log } from "console";
 
 interface Props {
   data: OrderItem[];
@@ -17,6 +18,7 @@ interface Props {
 
 const PickingList: React.FC<Props> = ({ data, shippingMethod, loadedAt, sheet, excludedItemsCount, shippingNotes, onDataCalculated }) => {
   const [isSorted, setIsSorted] = useState<boolean>(true);
+  console.log(data);
 
 // 1. フックからソートされていない「生」のリストを受け取る
   const { rawPickingList, totalSingleUnits } = usePickingLogic(data, sheet);
