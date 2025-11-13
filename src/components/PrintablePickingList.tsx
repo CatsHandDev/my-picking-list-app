@@ -1,14 +1,6 @@
 import React from 'react';
 import type { OrderItem, PickingItemRow } from "../types";
-import { SKU_LOT_UNIT_MAP } from "../types";
 import { formatJanDisplay } from '@/utils/janDisplayHelper';
-
-// PickingListから型定義などを再利用
-interface RowData {
-  商品名: string;
-  JANコード: string;
-  単品換算数: number;
-}
 
 interface PrintableProps {
   pickingList: PickingItemRow[];

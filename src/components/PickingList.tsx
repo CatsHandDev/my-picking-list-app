@@ -3,7 +3,6 @@ import type { OrderItem, PickingItemRow } from "../types";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import { usePickingLogic } from "../hooks/usePickingLogic";
 import { formatJanDisplay } from "../utils/janDisplayHelper";
-import { log } from "console";
 
 interface Props {
   data: OrderItem[];

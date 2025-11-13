@@ -113,6 +113,7 @@ function Home() {
         const processedData = results.data.map(row => {
           const newRow: Partial<OrderItem> = {};
           validHeaders.forEach(header => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const anyRow = row as any; 
             newRow[header as keyof OrderItem] = anyRow[header];
           });

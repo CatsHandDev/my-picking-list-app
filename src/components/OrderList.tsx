@@ -40,8 +40,6 @@ const OrderList: React.FC<Props> = ({ data, sheet, title, currentView }) => {
     return goQNumbers.size;
   }, [data]);
 
-  const showCalculatedTotalColumn = currentView === 'order';
-
   return (
     <div className="list-wrapper">
       {/* 1. 固定したいヘッダー部分 (スクロールするコンテナの外に出す) */}
