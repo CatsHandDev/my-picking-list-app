@@ -10,8 +10,9 @@ import { useReactToPrint } from 'react-to-print';
 import { useSheetData } from '../hooks/useSheetData';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useSheetNames } from '../hooks/useSheetNames';
-import { SKU_LOT_UNIT_MAP } from '../types';
 import './page.css';
+import { calculateSetCount } from '@/utils/itemCalculations';
+import { SELECTABLE_SERIES_SKU_MAP } from '@/utils/exceptionProducts';
 
 function Home() {
   const [data, setData] = useState<OrderItem[]>([]);
@@ -66,29 +67,22 @@ function Home() {
     // データを走査して、条件に合うものを新しい配列に格納する
     const filteredAndMappedData = data
       .map((item) => {
-        const sku = item['SKU管理番号'];
-        const csvQuantity = parseInt(item['個数'], 10) || 0;
-        let calculatedTotal: number;
-
-        // SKUが特別リストに含まれているかチェック
-        if (sku && SKU_LOT_UNIT_MAP[sku]) {
-          calculatedTotal = SKU_LOT_UNIT_MAP[sku];
-        } else {
-          // そうでなければ、CSVの個数をそのまま使う
-          // (calculateSetCountはシート情報が必要なので、ここでは単純なロジックに)
-          calculatedTotal = csvQuantity;
-        }
-        
-        // 新しいプロパティとして計算結果を追加した新しいオブジェクトを返す
+        // ユーティリティ関数を使って、常に正確な単品総数を計算する
+        const calculatedTotal = calculateSetCount(item, sheetData) * (parseInt(item['個数'], 10) || 0);
         return {
           ...item,
           '計算後総個数': calculatedTotal,
         } as OrderItem;
       })
       .filter(item => {
-        // フィルタリングは、追加した新しいプロパティで行う
-        return item['計算後総個数']! >= 2;
-      });
+      const itemSku = item['商品SKU'];
+
+      // 【選べる】シリーズかどうかを、インポートしたMAPで判定
+      const isSelectableSeries = itemSku ? SELECTABLE_SERIES_SKU_MAP[itemSku] === true : false;
+
+      // フィルタリング条件
+      return isSelectableSeries || item['計算後総個数']! >= 2;
+    });
 
     return filteredAndMappedData;
   }, [data]);
