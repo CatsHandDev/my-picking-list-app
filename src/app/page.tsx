@@ -245,6 +245,7 @@ function Home() {
                     shippingNotes={shippingNotes}
                     multiItemOrders={multiItemOrders}
                     uniqueOrderCount={uniqueOrderCount}
+                    sheet={sheetData}
                   />
                 </div>
               </>

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { OrderItem, PickingItemRow } from "../types";
 import { formatJanDisplay } from '@/utils/janDisplayHelper';
+import { calculateSetCount } from '../utils/itemCalculations';
 
 interface PrintableProps {
   pickingList: PickingItemRow[];
@@ -10,6 +11,7 @@ interface PrintableProps {
   multiItemOrders: OrderItem[];
   shippingNotes: string[];
   uniqueOrderCount: number;
+  sheet: string[][];
 }
 
 // forwardRef を使って親から ref を受け取れるようにする
@@ -21,7 +23,8 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
     totalSingleUnits, 
     multiItemOrders,
     shippingNotes,
-    uniqueOrderCount // propを受け取る
+    uniqueOrderCount,
+    sheet
   }, ref) => {
     
     return (
@@ -166,20 +169,28 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                   <th style={{ width: '15%' }}>送付先氏名</th>
                   <th style={{ flex: 1 }}>商品名</th>
                   <th style={{ width: '5%' }}>個数</th>
+                  <th style={{ width: '5%' }}>単品総数</th>
                   <th style={{ width: '10%' }}>JANコード</th>
                 </tr>
               </thead>
               <tbody>
-                {multiItemOrders.map((item, index) => (
-                  <tr key={`${item.受注番号}-${index}`}>
-                    <td style={{ fontSize: 10 }}>{item['GoQ管理番号']}</td>
-                    {/* <td>{item['受注番号']}</td> */}
-                    <td style={{ fontSize: 10 }}>{item['送付先氏名']}</td>
-                    <td style={{ fontSize: 10, flex: 1 }}>{item['商品名']}</td>
-                    <td style={{ fontSize: 10, textAlign: 'center' }}>{item['個数']}</td>
-                    <td style={{ fontSize: 10, textAlign: 'center' }}>{item['JANコード'].slice(-4)}</td>
-                  </tr>
-                ))}
+                {multiItemOrders.map((item, index) => {
+                  const setCount = calculateSetCount(item, sheet);
+                  const csvQuantity = parseInt(item['個数'], 10) || 0;
+                  const totalQuantity = setCount * csvQuantity;
+
+                  return (
+                    <tr key={`${item.受注番号}-${index}`}>
+                      <td>{item['GoQ管理番号']}</td>
+                      {/* <td>{item['受注番号']}</td> */}
+                      <td>{item['注文者氏名']}</td>
+                      <td>{item['商品名']}</td>
+                      <td style={{ fontSize: 16, textAlign: 'center' }}>{item['個数']}</td>
+                      <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{totalQuantity}</td>
+                      <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{item['JANコード'].slice(-4)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
