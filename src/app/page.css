@@ -279,7 +279,7 @@ tbody tr:nth-child(even) {
   text-align: center;
 }
 
-.jan, .count {
+.jan, .count .parent-jan {
   font-size: 12px;
   font-weight: bold;
 }
@@ -576,6 +576,11 @@ tfoot .footer-row {
 
   .case .count {
     width: 5%;
+  }
+
+  .jan, .count .parent-jan .parent-quantity {
+    font-size: 14px;
+    font-weight: bold;
   }
 
   td.itemName {

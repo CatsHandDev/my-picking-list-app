@@ -101,7 +101,7 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                 <td className="check"></td>
                 <td className="itemName">{item.商品名}</td>
                 <td className="jan">
-                  {formatJanDisplay(item.JANコード)}
+                  <span className="jan">{formatJanDisplay(item.JANコード)}</span>
                   {item.親JANコード && (
                     <>
                       <br />
@@ -110,7 +110,7 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                   )}
                 </td>
                 <td className="count">
-                  {item.単品換算数}
+                  <span className="count">{item.単品換算数}</span>
                   {(item.親数量 && item.親数量 > 0) ? (
                     <>
                       <br />
