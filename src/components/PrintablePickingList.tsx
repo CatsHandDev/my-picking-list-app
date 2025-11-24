@@ -85,8 +85,8 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
               <th className="check">P</th>
               <th className="itemName">商品名</th>
               <th className="jan">JAN</th>
+              <th className="other">仕分け</th>
               <th className="count">数量</th>
-              <th className="other">仕</th>
               <th className="case">ケース</th>
               <th className="case">1個</th>
               <th className="other">その他</th>
@@ -110,6 +110,7 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                     </>
                   )}
                 </td>
+                <td className="other"></td>
                 <td className="count">
                   <span className="count">{item.単品換算数}</span>
                   {(item.親数量 && item.親数量 > 0) ? (
@@ -120,7 +121,6 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                   ) : null
                   }
                 </td>
-                <td className="other"></td>
                 <td className="case"></td>
                 <td className="box"></td>
                 <td className="other"></td>
@@ -135,8 +135,8 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
               <td className="check">&nbsp;</td>
               <td className="itemName">&nbsp;</td>
               <td className="jan">&nbsp;</td>
-              <td className="count">&nbsp;</td>
               <td className="other">&nbsp;</td>
+              <td className="count">&nbsp;</td>
               <td className="case">&nbsp;</td>
               <td className="box">&nbsp;</td>
               <td className="other">&nbsp;</td>
@@ -151,8 +151,8 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
               <td className="check">合計</td>
               <td className="itemName"></td>
               <td className="jan"></td>
-              <td className="count">{totalSingleUnits}</td>
               <td className="other"></td>
+              <td className="count">{totalSingleUnits}</td>
               <td className="case"></td>
               <td className="box"></td>
               <td className="other"></td>
@@ -188,7 +188,7 @@ const PrintablePickingList = React.forwardRef<HTMLDivElement, PrintableProps>(
                     <tr key={`${item.受注番号}-${index}`}>
                       <td>{item['GoQ管理番号']}</td>
                       {/* <td>{item['受注番号']}</td> */}
-                      <td>{item['注文者氏名']}</td>
+                      <td>{item['送付先氏名']}</td>
                       <td>{item['商品名']}</td>
                       <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{displayQuantity}</td>
                       <td style={{ fontSize: 16, textAlign: 'center', fontWeight: 'bold' }}>{formatJanDisplay(item['JANコード'].slice(-4))}</td>
