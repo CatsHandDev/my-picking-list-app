@@ -43,8 +43,11 @@ export const SELECTABLE_SERIES_SKU_MAP: { [key: string]: boolean } = {
     'B09TQRR9PZ-v3881-1': true,
     'B09TQRR9PZ-v3881-3': true,
 
-    // JOOMO
+    // JOOMO 
     'maker-B0C1JXDG1F-1561': true,
+
+    // 【まとめ買い6個】びっくらたまご アンパンマン シリーズ おそらでさんぽ編 バスボール 炭酸入浴剤
+    'A1446-070912-J1886-S6': true,
 
     // 他の【選べる】シリーズ商品があれば、ここに追記
     // 'some-other-product-sku': true,
